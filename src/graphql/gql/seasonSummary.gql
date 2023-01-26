@@ -1,0 +1,17 @@
+fragment seasonSummary on SeasonSummaryDTO {
+  numTrades
+  numGoodTrades
+  profitLossTotal
+  profitLossPerTrade
+  numIsYolo
+  targetAvg
+  percentileAvg
+  betSizeAvg
+  numBuys
+}
+
+query SeasonSummary($username: String!, $seasonId: Int) {
+  seasonSummary(username: $username, seasonId: $seasonId) {
+    ...seasonSummary
+  }
+}

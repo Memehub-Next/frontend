@@ -1,0 +1,24 @@
+# RedditMeme
+fragment redditMeme on RedditMemeEntity {
+  id
+  title
+  subreddit
+  url
+  redditId
+  redditBet {
+    ...redditBet
+  }
+}
+
+fragment paginatedRedditMemes on RedditMemePDTO {
+  items {
+    ...redditMeme
+  }
+  hasMore
+}
+
+query RandomRedditMemes($take: Int!, $skip: Int!, $traded: Boolean!, $eTradedOrder: ETradedOrder) {
+  randomRedditMemes(take: $take, skip: $skip, traded: $traded, eTradedOrder: $eTradedOrder) {
+    ...paginatedRedditMemes
+  }
+}

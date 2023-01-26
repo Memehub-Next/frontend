@@ -1,0 +1,19 @@
+# Leaderboard
+fragment leader on LeaderboardDTO {
+  username
+  avatar
+  profitLoss
+  rank
+}
+
+query Leaderboard($eLeaderboard: ELeaderboard!, $seasonId: Int, $take: Int) {
+  leaderboard(eLeaderboard: $eLeaderboard, seasonId: $seasonId, take: $take) {
+    ...leader
+  }
+}
+
+query MyLeaderboard($eLeaderboard: ELeaderboard!, $seasonId: Int) {
+  myLeaderboard(eLeaderboard: $eLeaderboard, seasonId: $seasonId) {
+    ...leader
+  }
+}

@@ -1,0 +1,70 @@
+# RedditBet
+fragment redditBet on RedditBetEntity {
+  id
+  redditMemeId
+  betSize
+  target
+  percentile
+  username
+  createdAt
+  profitLoss
+  isYolo
+  side
+}
+
+fragment redditBetMeme on RedditBetEntity {
+  ...redditBet
+  meme {
+    id
+    url
+  }
+}
+
+fragment paginatedRedditBets on RedditBetPDTO {
+  items {
+    ...redditBetMeme
+  }
+  hasMore
+}
+
+query UserRedditBetsPaginated(
+  $take: Int!
+  $skip: Int!
+  $eRedditBetOrder: ERedditBetOrder!
+  $username: String!
+  $isASC: Boolean!
+  $isYolo: Boolean
+  $seasonId: Int
+  $ePositionSide: EPositionSide
+) {
+  userRedditBetsPaginated(
+    take: $take
+    skip: $skip
+    seasonId: $seasonId
+    eRedditBetOrder: $eRedditBetOrder
+    username: $username
+    ePositionSide: $ePositionSide
+    isASC: $isASC
+    isYolo: $isYolo
+  ) {
+    ...paginatedRedditBets
+  }
+}
+
+query UserRedditBets($take: Int!, $username: String!, $isYolo: Boolean, $seasonId: Int, $ePositionSide: EPositionSide) {
+  userRedditBets(take: $take, seasonId: $seasonId, username: $username, ePositionSide: $ePositionSide, isYolo: $isYolo) {
+    ...redditBet
+  }
+}
+
+query MyRedditBet($redditMemeId: String!, $seasonId: Int) {
+  myRedditBet(redditMemeId: $redditMemeId, seasonId: $seasonId) {
+    ...redditBet
+  }
+}
+
+mutation PlaceBet($betSize: Int!, $redditMemeId: String!, $ePositionSide: EPositionSide!, $target: Int) {
+  placeBet(betSize: $betSize, redditMemeId: $redditMemeId, ePositionSide: $ePositionSide, target: $target) {
+    ...redditBet
+  }
+}

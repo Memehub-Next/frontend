@@ -1,0 +1,4 @@
+# Season
+query GetCurrentSeasonId {
+  getCurrentSeasonId
+}

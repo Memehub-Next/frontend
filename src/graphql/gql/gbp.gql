@@ -1,0 +1,11 @@
+query WojakLevel($username: String!) {
+  wojakLevel(username: $username)
+}
+
+query TotalGbp($username: String!) {
+  totalGbp(username: $username)
+}
+
+query GbpBySeason($username: String!, $seasonId: Int!) {
+  gbpBySeason(username: $username, seasonId: $seasonId)
+}

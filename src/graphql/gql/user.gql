@@ -1,0 +1,25 @@
+fragment user on UserEntity {
+  username
+  roles
+  gbp
+  wojakLevel
+}
+
+query Me {
+  me {
+    ...user
+  }
+}
+
+mutation CreateHiveAcct($username: String!, $password: String!) {
+  createHiveAcct(username: $username, password: $password)
+}
+
+mutation HiveLogin($message: String!, $signedMessage: String!, $username: String!) {
+  hiveLogin(message: $message, signedMessage: $signedMessage, username: $username) {
+    ...user
+  }
+}
+mutation Logout {
+  logout
+}

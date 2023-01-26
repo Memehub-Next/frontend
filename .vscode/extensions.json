@@ -1,0 +1,16 @@
+{
+  "recommendations": [
+    "apollographql.vscode-apollo",
+    "aaron-bond.better-comments",
+    "mikestead.dotenv",
+    "dsznajder.es7-react-js-snippets",
+    "graphql.vscode-graphql",
+    "kumar-harsh.graphql-for-vscode",
+    "oderwat.indent-rainbow",
+    "pkief.material-icon-theme",
+    "christian-kohler.path-intellisense",
+    "csstools.postcss",
+    "esbenp.prettier-vscode",
+    "meganrogge.template-string-converter"
+  ]
+}
