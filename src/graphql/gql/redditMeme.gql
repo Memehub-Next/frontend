@@ -17,8 +17,8 @@ fragment paginatedRedditMemes on RedditMemePDTO {
   hasMore
 }
 
-query RandomRedditMemes($take: Int!, $skip: Int!, $traded: Boolean!, $eTradedOrder: ETradedOrder) {
-  randomRedditMemes(take: $take, skip: $skip, traded: $traded, eTradedOrder: $eTradedOrder) {
-    ...paginatedRedditMemes
+query RandomRedditMemes($take: Int!) {
+  randomRedditMemes(take: $take) {
+    ...redditMeme
   }
 }

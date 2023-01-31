@@ -1,12 +1,10 @@
 import { Flex } from "@chakra-ui/react";
 import { PropsWithChildren } from "react";
-import { CommentsModal } from "../comments/CommentsModal";
+import { ImageModal } from "../misc/ImageModal";
 import { ScrollToTop } from "../misc/ScrollToTop";
-import { FlagModal } from "../modals/Flag";
-import { ImageModal } from "../modals/ImageModal";
 
-import { PageContainer } from "./components/PageContainer";
-import { MobileNavBar } from "./navbar/MobileNavBar";
+import { MobileNavBar } from "./MobileNavBar";
+import { PageContainer } from "./PageContainer";
 
 export const SingleColLayout: React.FC<PropsWithChildren<{}>> = ({ children }) => (
   <PageContainer minH="100vh" overflow="auto">
@@ -22,8 +20,6 @@ export const SingleColLayout: React.FC<PropsWithChildren<{}>> = ({ children }) =
       {children}
     </Flex>
     <ScrollToTop />
-    <FlagModal />
     <ImageModal />
-    <CommentsModal />
   </PageContainer>
 );

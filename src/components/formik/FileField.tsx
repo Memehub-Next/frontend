@@ -2,7 +2,7 @@ import { Button, chakra, FormControl, HStack, Image, Tooltip, useToast } from "@
 import { ErrorMessage, useField } from "formik";
 import { ChangeEvent, PropsWithChildren, useState } from "react";
 import { FaClipboard, FaTrashAlt } from "react-icons/fa";
-import { DEFAULT_IMAGE } from "../../core/utils/constants";
+import { DEFAULT_IMAGE } from "../../utils/constants";
 
 interface FileFieldProps {
   name: string;

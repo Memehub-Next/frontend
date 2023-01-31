@@ -1,8 +1,7 @@
-import { Table, TableProps, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
+import { SkeletonText, Table, TableProps, Tbody, Td, Text, Th, Thead, Tr } from "@chakra-ui/react";
 import React from "react";
 import { Omit } from "utility-types";
 import { SeasonSummaryFragment, useSeasonSummaryQuery } from "../../../graphql/urql-codegen";
-import { ExtendedText } from "../../chakra/ExtendedText";
 
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -56,9 +55,9 @@ export const SeasonSummaryTable: React.FC<SeasonSummaryTableProps> = React.memo(
         <Tr>
           {keys.map((key) => (
             <Td isNumeric key={key}>
-              <ExtendedText example="1000" isLoaded={isLoaded}>
-                {summary ? summary[key] : undefined}
-              </ExtendedText>
+              <SkeletonText noOfLines={1} isLoaded={isLoaded}>
+                <Text noOfLines={1}>{summary ? summary[key] : undefined}</Text>
+              </SkeletonText>
             </Td>
           ))}
         </Tr>

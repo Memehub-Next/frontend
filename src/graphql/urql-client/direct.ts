@@ -3,7 +3,7 @@ import { devtoolsExchange } from "@urql/devtools";
 import { requestPolicyExchange } from "@urql/exchange-request-policy";
 import { dedupExchange, fetchExchange } from "urql";
 import { errorExchange } from ".";
-import { normalizedCache } from "./cache/normalizedCache";
+import { normalizedCache } from "./normalizedCache";
 
 export const urqlClient = (headers: any = {}) =>
   createClient({

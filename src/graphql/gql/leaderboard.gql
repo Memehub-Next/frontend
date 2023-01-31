@@ -6,9 +6,16 @@ fragment leader on LeaderboardDTO {
   rank
 }
 
-query Leaderboard($eLeaderboard: ELeaderboard!, $seasonId: Int, $take: Int) {
-  leaderboard(eLeaderboard: $eLeaderboard, seasonId: $seasonId, take: $take) {
+fragment leaderboardPDTO on LeaderboardPDTO {
+  items {
     ...leader
+  }
+  hasMore
+}
+
+query Leaderboard($eLeaderboard: ELeaderboard!, $take: Int!, $skip: Int!, $seasonId: Int) {
+  leaderboard(eLeaderboard: $eLeaderboard, take: $take, skip: $skip, seasonId: $seasonId) {
+    ...leaderboardPDTO
   }
 }
 

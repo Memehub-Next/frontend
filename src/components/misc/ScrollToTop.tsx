@@ -1,6 +1,6 @@
 import { Box } from "@chakra-ui/layout";
 import { useEffect, useState } from "react";
-import { Environment } from "../../core/utils/environment";
+import { Environment } from "../../utils/environment";
 
 interface ScrollToTopProps {}
 

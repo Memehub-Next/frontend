@@ -1,16 +1,15 @@
-import { Grid, GridItem, VStack } from "@chakra-ui/react";
+import { Divider, Grid, GridItem, VStack } from "@chakra-ui/react";
 import { PropsWithChildren } from "react";
+import { LeaderboardWidget } from "../leaderboards/LeaderboardWidget";
+import { ImageModal } from "../misc/ImageModal";
 import { ScrollToTop } from "../misc/ScrollToTop";
-import { ImageModal } from "../modals/ImageModal";
-import { DefaultRightColumnItems } from "./components/DefaultRightColumnItems";
-import { PageContainer } from "./components/PageContainer";
-import { MobileNavBar } from "./navbar/MobileNavBar";
+import { CryptoTickers } from "./CryptoTickers";
+import { MobileNavBar } from "./MobileNavBar";
+import { PageContainer } from "./PageContainer";
 
-interface DoubleColLayoutProps {
-  RightColumn?: React.ReactNode;
-}
+interface DoubleColLayoutProps {}
 
-export const DoubleColLayout: React.FC<PropsWithChildren<DoubleColLayoutProps>> = ({ children, RightColumn }) => (
+export const DoubleColLayout: React.FC<PropsWithChildren<DoubleColLayoutProps>> = ({ children }) => (
   <PageContainer minHeight="100vh" overflow="auto">
     <MobileNavBar />
     <Grid
@@ -36,7 +35,10 @@ export const DoubleColLayout: React.FC<PropsWithChildren<DoubleColLayoutProps>> 
           width={{ base: "100%", md: "100%", lg: "25%" }}
           marginBottom={{ base: "2rem", md: "2rem", sm: "2rem" }}
         >
-          {RightColumn || <DefaultRightColumnItems />}
+          <CryptoTickers />
+          <Divider />
+          <LeaderboardWidget />
+          <Divider />
         </VStack>
       </GridItem>
     </Grid>

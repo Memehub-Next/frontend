@@ -57,6 +57,12 @@ export type LeaderboardDto = {
   username: Scalars['String'];
 };
 
+export type LeaderboardPdto = {
+  __typename?: 'LeaderboardPDTO';
+  hasMore: Scalars['Boolean'];
+  items: Array<LeaderboardDto>;
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   createHiveAcct: Scalars['Boolean'];
@@ -97,11 +103,12 @@ export type Query = {
   __typename?: 'Query';
   gbpBySeason: Scalars['Int'];
   getCurrentSeasonId: Scalars['Int'];
-  leaderboard: Array<LeaderboardDto>;
+  getTradedRedditMemes: RedditMemePdto;
+  leaderboard: LeaderboardPdto;
   me?: Maybe<UserEntity>;
   myLeaderboard?: Maybe<LeaderboardDto>;
   myRedditBet?: Maybe<RedditBetEntity>;
-  randomRedditMemes: RedditMemePdto;
+  randomRedditMemes: Array<RedditMemeEntity>;
   seasonSummary?: Maybe<SeasonSummaryDto>;
   totalGbp: Scalars['Int'];
   user?: Maybe<UserEntity>;
@@ -117,10 +124,19 @@ export type QueryGbpBySeasonArgs = {
 };
 
 
+export type QueryGetTradedRedditMemesArgs = {
+  eTradedOrder?: InputMaybe<ETradedOrder>;
+  skip: Scalars['Int'];
+  take: Scalars['Int'];
+  traded: Scalars['Boolean'];
+};
+
+
 export type QueryLeaderboardArgs = {
   eLeaderboard: ELeaderboard;
   seasonId?: InputMaybe<Scalars['Int']>;
-  take?: InputMaybe<Scalars['Int']>;
+  skip: Scalars['Int'];
+  take: Scalars['Int'];
 };
 
 
@@ -137,10 +153,7 @@ export type QueryMyRedditBetArgs = {
 
 
 export type QueryRandomRedditMemesArgs = {
-  eTradedOrder?: InputMaybe<ETradedOrder>;
-  skip: Scalars['Int'];
   take: Scalars['Int'];
-  traded: Scalars['Boolean'];
 };
 
 
@@ -210,6 +223,7 @@ export type RedditBetPdto = {
 export type RedditMemeEntity = {
   __typename?: 'RedditMemeEntity';
   author: Scalars['String'];
+  createdAt: Scalars['DateTime'];
   downvotes: Scalars['Int'];
   id: Scalars['ID'];
   numComments: Scalars['Int'];
@@ -276,14 +290,17 @@ export type GbpBySeasonQuery = { __typename?: 'Query', gbpBySeason: number };
 
 export type LeaderFragment = { __typename?: 'LeaderboardDTO', username: string, avatar?: string | null, profitLoss: number, rank: number };
 
+export type LeaderboardPdtoFragment = { __typename?: 'LeaderboardPDTO', hasMore: boolean, items: Array<{ __typename?: 'LeaderboardDTO', username: string, avatar?: string | null, profitLoss: number, rank: number }> };
+
 export type LeaderboardQueryVariables = Exact<{
   eLeaderboard: ELeaderboard;
+  take: Scalars['Int'];
+  skip: Scalars['Int'];
   seasonId?: InputMaybe<Scalars['Int']>;
-  take?: InputMaybe<Scalars['Int']>;
 }>;
 
 
-export type LeaderboardQuery = { __typename?: 'Query', leaderboard: Array<{ __typename?: 'LeaderboardDTO', username: string, avatar?: string | null, profitLoss: number, rank: number }> };
+export type LeaderboardQuery = { __typename?: 'Query', leaderboard: { __typename?: 'LeaderboardPDTO', hasMore: boolean, items: Array<{ __typename?: 'LeaderboardDTO', username: string, avatar?: string | null, profitLoss: number, rank: number }> } };
 
 export type MyLeaderboardQueryVariables = Exact<{
   eLeaderboard: ELeaderboard;
@@ -348,13 +365,10 @@ export type PaginatedRedditMemesFragment = { __typename?: 'RedditMemePDTO', hasM
 
 export type RandomRedditMemesQueryVariables = Exact<{
   take: Scalars['Int'];
-  skip: Scalars['Int'];
-  traded: Scalars['Boolean'];
-  eTradedOrder?: InputMaybe<ETradedOrder>;
 }>;
 
 
-export type RandomRedditMemesQuery = { __typename?: 'Query', randomRedditMemes: { __typename?: 'RedditMemePDTO', hasMore: boolean, items: Array<{ __typename?: 'RedditMemeEntity', id: string, title: string, subreddit: string, url: string, redditId: string, redditBet?: { __typename?: 'RedditBetEntity', id: string, redditMemeId: string, betSize: number, target?: number | null, percentile: number, username: string, createdAt: any, profitLoss: number, isYolo: boolean, side: EPositionSide } | null }> } };
+export type RandomRedditMemesQuery = { __typename?: 'Query', randomRedditMemes: Array<{ __typename?: 'RedditMemeEntity', id: string, title: string, subreddit: string, url: string, redditId: string, redditBet?: { __typename?: 'RedditBetEntity', id: string, redditMemeId: string, betSize: number, target?: number | null, percentile: number, username: string, createdAt: any, profitLoss: number, isYolo: boolean, side: EPositionSide } | null }> };
 
 export type GetCurrentSeasonIdQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -371,12 +385,19 @@ export type SeasonSummaryQueryVariables = Exact<{
 
 export type SeasonSummaryQuery = { __typename?: 'Query', seasonSummary?: { __typename?: 'SeasonSummaryDTO', numTrades: number, numGoodTrades: number, profitLossTotal: number, profitLossPerTrade: number, numIsYolo: number, targetAvg: number, percentileAvg: number, betSizeAvg: number, numBuys: number } | null };
 
-export type UserFragment = { __typename?: 'UserEntity', username: string, roles: Array<EUserRole>, gbp: number, wojakLevel: number };
+export type UserFragment = { __typename?: 'UserEntity', username: string, avatar?: string | null, roles: Array<EUserRole>, gbp: number, wojakLevel: number };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'UserEntity', username: string, roles: Array<EUserRole>, gbp: number, wojakLevel: number } | null };
+export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'UserEntity', username: string, avatar?: string | null, roles: Array<EUserRole>, gbp: number, wojakLevel: number } | null };
+
+export type UserQueryVariables = Exact<{
+  username: Scalars['String'];
+}>;
+
+
+export type UserQuery = { __typename?: 'Query', user?: { __typename?: 'UserEntity', username: string, avatar?: string | null, roles: Array<EUserRole>, gbp: number, wojakLevel: number } | null };
 
 export type CreateHiveAcctMutationVariables = Exact<{
   username: Scalars['String'];
@@ -393,7 +414,7 @@ export type HiveLoginMutationVariables = Exact<{
 }>;
 
 
-export type HiveLoginMutation = { __typename?: 'Mutation', hiveLogin: { __typename?: 'UserEntity', username: string, roles: Array<EUserRole>, gbp: number, wojakLevel: number } };
+export type HiveLoginMutation = { __typename?: 'Mutation', hiveLogin: { __typename?: 'UserEntity', username: string, avatar?: string | null, roles: Array<EUserRole>, gbp: number, wojakLevel: number } };
 
 export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -408,6 +429,14 @@ export const LeaderFragmentDoc = gql`
   rank
 }
     `;
+export const LeaderboardPdtoFragmentDoc = gql`
+    fragment leaderboardPDTO on LeaderboardPDTO {
+  items {
+    ...leader
+  }
+  hasMore
+}
+    ${LeaderFragmentDoc}`;
 export const RedditBetFragmentDoc = gql`
     fragment redditBet on RedditBetEntity {
   id
@@ -475,6 +504,7 @@ export const SeasonSummaryFragmentDoc = gql`
 export const UserFragmentDoc = gql`
     fragment user on UserEntity {
   username
+  avatar
   roles
   gbp
   wojakLevel
@@ -508,12 +538,17 @@ export function useGbpBySeasonQuery(options: Omit<Urql.UseQueryArgs<GbpBySeasonQ
   return Urql.useQuery<GbpBySeasonQuery, GbpBySeasonQueryVariables>({ query: GbpBySeasonDocument, ...options });
 };
 export const LeaderboardDocument = gql`
-    query Leaderboard($eLeaderboard: ELeaderboard!, $seasonId: Int, $take: Int) {
-  leaderboard(eLeaderboard: $eLeaderboard, seasonId: $seasonId, take: $take) {
-    ...leader
+    query Leaderboard($eLeaderboard: ELeaderboard!, $take: Int!, $skip: Int!, $seasonId: Int) {
+  leaderboard(
+    eLeaderboard: $eLeaderboard
+    take: $take
+    skip: $skip
+    seasonId: $seasonId
+  ) {
+    ...leaderboardPDTO
   }
 }
-    ${LeaderFragmentDoc}`;
+    ${LeaderboardPdtoFragmentDoc}`;
 
 export function useLeaderboardQuery(options: Omit<Urql.UseQueryArgs<LeaderboardQueryVariables>, 'query'>) {
   return Urql.useQuery<LeaderboardQuery, LeaderboardQueryVariables>({ query: LeaderboardDocument, ...options });
@@ -594,17 +629,12 @@ export function usePlaceBetMutation() {
   return Urql.useMutation<PlaceBetMutation, PlaceBetMutationVariables>(PlaceBetDocument);
 };
 export const RandomRedditMemesDocument = gql`
-    query RandomRedditMemes($take: Int!, $skip: Int!, $traded: Boolean!, $eTradedOrder: ETradedOrder) {
-  randomRedditMemes(
-    take: $take
-    skip: $skip
-    traded: $traded
-    eTradedOrder: $eTradedOrder
-  ) {
-    ...paginatedRedditMemes
+    query RandomRedditMemes($take: Int!) {
+  randomRedditMemes(take: $take) {
+    ...redditMeme
   }
 }
-    ${PaginatedRedditMemesFragmentDoc}`;
+    ${RedditMemeFragmentDoc}`;
 
 export function useRandomRedditMemesQuery(options: Omit<Urql.UseQueryArgs<RandomRedditMemesQueryVariables>, 'query'>) {
   return Urql.useQuery<RandomRedditMemesQuery, RandomRedditMemesQueryVariables>({ query: RandomRedditMemesDocument, ...options });
@@ -639,6 +669,17 @@ export const MeDocument = gql`
 
 export function useMeQuery(options?: Omit<Urql.UseQueryArgs<MeQueryVariables>, 'query'>) {
   return Urql.useQuery<MeQuery, MeQueryVariables>({ query: MeDocument, ...options });
+};
+export const UserDocument = gql`
+    query User($username: String!) {
+  user(username: $username) {
+    ...user
+  }
+}
+    ${UserFragmentDoc}`;
+
+export function useUserQuery(options: Omit<Urql.UseQueryArgs<UserQueryVariables>, 'query'>) {
+  return Urql.useQuery<UserQuery, UserQueryVariables>({ query: UserDocument, ...options });
 };
 export const CreateHiveAcctDocument = gql`
     mutation CreateHiveAcct($username: String!, $password: String!) {

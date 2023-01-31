@@ -5,12 +5,30 @@ import React, { useState } from "react";
 import { AiOutlineCheck } from "react-icons/ai";
 import { MdOutlineClose } from "react-icons/md";
 import { EPositionSide, ERedditBetOrder, useUserRedditBetsPaginatedQuery } from "../../../graphql/urql-codegen";
-import { ExtendedText } from "../../chakra/ExtendedText";
 
+import { SkeletonText, Text, TextProps } from "@chakra-ui/react";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { useSkipPagination } from "../../../core/hooks/useSkipPagination";
+import { useSkipPagination } from "../../../hooks/useSkipPagination";
 dayjs.extend(relativeTime);
+
+interface ExtendedTextProps extends TextProps {
+  isLoaded: boolean;
+  example: string;
+  isNull?: boolean;
+}
+
+const ExtendedText: React.FC<ExtendedTextProps> = ({ isLoaded, example, noOfLines = 1, isNull = false, children, ...textProps }) => {
+  return (
+    <SkeletonText noOfLines={noOfLines} isLoaded={isLoaded}>
+      {isLoaded && isNull ? null : (
+        <Text noOfLines={noOfLines} {...textProps}>
+          {!isLoaded ? example : children}
+        </Text>
+      )}
+    </SkeletonText>
+  );
+};
 
 interface RedditBetsTableProps extends TableProps {
   username: string;
@@ -75,7 +93,7 @@ export const RedditBetsTable: React.FC<RedditBetsTableProps> = React.memo(({ use
           </Tr>
         </Thead>
         <Tbody>
-          {redditBets.fillOnEmpty(undefined, 9).map((redditBet, idx) => (
+          {(redditBets || Array(9).fill(undefined)).map((redditBet, idx) => (
             <Tr key={idx}>
               <Td>
                 <ExtendedText example="1 day, 19 hours, 39 minutes" isLoaded={isLoaded}>

@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction, useEffect } from "react";
 import { useGetCurrentSeasonIdQuery } from "../../graphql/urql-codegen";
-import { ExtendedNumberInput } from "../chakra/ExtendedNumberInput";
+import { NumberInputWrapper } from "../misc/NumberInputWrapper";
 
 interface SeasonNumberInputProps {
   seasonId?: number;
@@ -11,7 +11,7 @@ export const SeasonNumberInput: React.FC<SeasonNumberInputProps> = ({ seasonId, 
   const [seasonIdResp] = useGetCurrentSeasonIdQuery({ pause: Boolean(seasonId) });
   useEffect(() => setSeasonId(seasonIdResp.data?.getCurrentSeasonId), [seasonIdResp]);
   return (
-    <ExtendedNumberInput
+    <NumberInputWrapper
       size="xs"
       step={1}
       min={1}

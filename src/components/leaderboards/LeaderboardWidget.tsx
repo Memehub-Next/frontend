@@ -2,9 +2,10 @@ import { ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
 import { Button, HStack, StackProps, Text, useBoolean, VStack } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import { BiBookBookmark } from "react-icons/bi";
-import { useRedirect } from "../../core/hooks/useRedirect";
-import { ELeaderboard } from "../../graphql/urql-codegen";
-import { Leaderboard } from "./Leaderboard";
+import { ELeaderboard, useLeaderboardQuery } from "../../graphql/urql-codegen";
+import { useRedirect } from "../../hooks/useRedirect";
+import { Leader } from "./Leader";
+import { MyRank } from "./MyRank";
 
 const leaderboards = Object.values(ELeaderboard);
 
@@ -14,6 +15,7 @@ export const LeaderboardWidget: React.FC<LeaderboardWidgetProps> = React.memo((s
   const redirect = useRedirect();
   const [index, setIndex] = useState(0);
   const [userCalled, { off, on }] = useBoolean(false);
+  const [{ data }] = useLeaderboardQuery({ variables: { eLeaderboard: leaderboards[index], take: 3, skip: 0 } });
   const userSetIndex = () => {
     on();
     setIndex((index) => (index + 1) % leaderboards.length);
@@ -31,12 +33,26 @@ export const LeaderboardWidget: React.FC<LeaderboardWidgetProps> = React.memo((s
           <Text>{leaderboards[index]}</Text>
           <ChevronRightIcon _hover={{ cursor: "pointer" }} onClick={userSetIndex} />
         </HStack>
-        <Button size="xs" onClick={redirect("/seasons/history")}>
+        <Button size="xs" onClick={redirect("/history")}>
           <BiBookBookmark />
           <Text>History</Text>
         </Button>
       </HStack>
-      <Leaderboard eLeaderboard={leaderboards[index]} />
+      <VStack w="100%" spacing={0}>
+        <MyRank eLeaderboard={leaderboards[index]} />
+        {(data?.leaderboard.items ?? Array<undefined>(3).fill(undefined)).map((leader, idx) => (
+          <Leader
+            key={idx}
+            rank={idx + 1}
+            leader={leader}
+            py={3}
+            px={5}
+            w="100%"
+            justifyContent="space-between"
+            _hover={{ backgroundColor: "gray.800", cursor: "pointer" }}
+          />
+        ))}
+      </VStack>
     </VStack>
   );
 });

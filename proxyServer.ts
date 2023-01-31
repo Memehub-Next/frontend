@@ -4,7 +4,7 @@ dotenv.config();
 import express from "express";
 import { createProxyMiddleware } from "http-proxy-middleware";
 import next from "next";
-import { Environment } from "./src/core/utils/environment";
+import { Environment } from "./src/utils/environment";
 
 const { port } = Environment;
 const backendPort = 5000;
