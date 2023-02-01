@@ -1,4 +1,4 @@
-import { SkeletonText, Table, TableProps, Tbody, Td, Text, Th, Thead, Tr } from "@chakra-ui/react";
+import { SkeletonText, Table, TableProps, Tbody, Td, Text, Tr } from "@chakra-ui/react";
 import React from "react";
 import { Omit } from "utility-types";
 import { SeasonSummaryFragment, useSeasonSummaryQuery } from "../../../graphql/urql-codegen";
@@ -36,32 +36,44 @@ interface SeasonSummaryTableProps extends TableProps {
   seasonId?: number;
 }
 
-export const SeasonSummaryTable: React.FC<SeasonSummaryTableProps> = React.memo(({ username, seasonId, ...tableProps }) => {
+export const SeasonSummaryTable: React.FC<SeasonSummaryTableProps> = ({ username, seasonId, ...tableProps }) => {
   const [{ data }] = useSeasonSummaryQuery({ variables: { username, seasonId }, pause: !seasonId });
   const isLoaded = Boolean(data?.seasonSummary);
   const summary = data?.seasonSummary;
   return (
-    <Table {...tableProps}>
-      <Thead>
-        <Tr>
-          {keys.map((key) => (
-            <Th key={key} isNumeric={true} _hover={{ cursor: "pointer" }}>
-              {labels[key]}
-            </Th>
+    <>
+      <Table {...tableProps}>
+        <Tbody>
+          {keys.slice(0, Math.floor(keys.length / 2)).map((key) => (
+            <Tr key={key}>
+              <Td isNumeric={true} _hover={{ cursor: "pointer" }}>
+                {labels[key]}
+              </Td>
+              <Td isNumeric>
+                <SkeletonText noOfLines={1} isLoaded={isLoaded}>
+                  <Text noOfLines={1}>{summary ? summary[key] : undefined}</Text>
+                </SkeletonText>
+              </Td>
+            </Tr>
           ))}
-        </Tr>
-      </Thead>
-      <Tbody>
-        <Tr>
-          {keys.map((key) => (
-            <Td isNumeric key={key}>
-              <SkeletonText noOfLines={1} isLoaded={isLoaded}>
-                <Text noOfLines={1}>{summary ? summary[key] : undefined}</Text>
-              </SkeletonText>
-            </Td>
+        </Tbody>
+      </Table>
+      <Table {...tableProps}>
+        <Tbody>
+          {keys.slice(Math.ceil(keys.length / 2)).map((key) => (
+            <Tr key={key}>
+              <Td isNumeric={true} _hover={{ cursor: "pointer" }}>
+                {labels[key]}
+              </Td>
+              <Td isNumeric>
+                <SkeletonText noOfLines={1} isLoaded={isLoaded}>
+                  <Text noOfLines={1}>{summary ? summary[key] : undefined}</Text>
+                </SkeletonText>
+              </Td>
+            </Tr>
           ))}
-        </Tr>
-      </Tbody>
-    </Table>
+        </Tbody>
+      </Table>
+    </>
   );
-});
+};

@@ -20,7 +20,9 @@ export const GbpLineChart: React.FC<GbpLineChartProps> = React.memo(({ redditBet
           )
           .reverse()
       : [];
-  return (
+  return data.length === 0 ? (
+    <></>
+  ) : (
     <VStack>
       <Skeleton w="50rem" h="15rem" isLoaded={Boolean(data.length)}>
         <ResponsiveLine

@@ -62,9 +62,9 @@ const Page: NextPage<PageProps> = ({ username }) => {
     <DoubleColLayout>
       <VStack w="100%">
         <VStack w="100%" spacing={5}>
-          <HStack spacing={3}>
-            <Avatar size="xl" src={user?.avatar || DEFAULT_AVATAR} />
+          <HStack w="60%" spacing={3}>
             <VStack>
+              <Avatar border="1px solid white" size="xl" src={user?.avatar || DEFAULT_AVATAR} />
               <SkeletonText noOfLines={1} isLoaded={Boolean(user?.username)}>
                 <Text noOfLines={1} fontSize="xl" fontWeight="bold">
                   {user?.username}
@@ -77,13 +77,13 @@ const Page: NextPage<PageProps> = ({ username }) => {
                 <Badge _hover={{ cursor: "pointer" }}>Level {user?.wojakLevel}</Badge>
               </Tooltip>
             </VStack>
+            <SeasonSummaryTable seasonId={seasonId} username={username} />
           </HStack>
           <VStack>
             <Text>Reddit Bets Analysis</Text>
             <SeasonNumberInput seasonId={seasonId} setSeasonId={setSeasonId} />
             <ProfitLossBarChart redditBets={data?.userRedditBets} />
             <GbpLineChart seasonId={seasonId} username={username} redditBets={data?.userRedditBets} />
-            <SeasonSummaryTable seasonId={seasonId} username={username} />
             <RedditBetsTable seasonId={seasonId} username={username} />
           </VStack>
         </VStack>
