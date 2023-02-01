@@ -30,4 +30,4 @@ const Page: NextPage = () => (
     </Center>
   </DoubleColLayout>
 );
-export default withUrqlClient(nextUrqlClient, { ssr: false })(Page);
+export default withUrqlClient(nextUrqlClient, { ssr: true })(Page);
