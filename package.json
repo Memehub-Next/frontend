@@ -3,6 +3,7 @@
   "name": "memehub-frontend",
   "scripts": {
     "build": "next build",
+    "start": "next start",
     "dev": "ts-node-dev --poll --interval 1000 --respawn --transpile-only --debug --clear --watch src,proxyServer.ts --ignore-watch .next proxyServer.ts",
     "gen:rest": "openapi-codegen gen memehubRestBE",
     "gen:gql": "graphql-codegen --config codegen.yml",
