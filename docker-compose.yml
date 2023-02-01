@@ -1,0 +1,11 @@
+version: "3.7"
+services:
+  frontend:
+    build: .
+    container_name: frontend
+    command: npm run start
+    restart: on-failure
+    env_file:
+      - ./.env
+    ports:
+      - 3000:3000
