@@ -8,7 +8,7 @@ interface BetResultMenuProps extends ButtonProps {
 
 export const BetResultMenu: React.FC<BetResultMenuProps> = ({ redditBet: { side, target, betSize, percentile, profitLoss } }) => {
   return (
-    <Table w="40%">
+    <Table w="50%">
       <Tbody>
         <Tr>
           <Td>Side</Td>

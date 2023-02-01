@@ -11,8 +11,10 @@ import {
   MeQuery,
   PlaceBetMutation,
   PlaceBetMutationVariables,
+  RedditMemeFragment,
 } from "../urql-codegen";
 import { LogoutMutation } from "../urql-codegen/index";
+import { RedditMemeFragmentDoc } from "./../urql-codegen/index";
 
 const { toast } = createStandaloneToast();
 
@@ -63,7 +65,7 @@ export const normalizedCache = cacheExchange({
         cache.updateQuery<MeQuery>({ query: MeDocument }, (_data) => ({ me: parent.hiveLogin }));
         await Router.push("/");
       },
-      placeBet: (parent: PlaceBetMutation, _args: PlaceBetMutationVariables, cache: Cache, _info: ResolveInfo) =>
+      placeBet: (parent: PlaceBetMutation, _args: PlaceBetMutationVariables, cache: Cache, _info: ResolveInfo) => {
         cache.updateQuery<MeQuery>({ query: MeDocument }, (data) => {
           const user = data?.me;
           if (!user) return data;
@@ -72,7 +74,15 @@ export const normalizedCache = cacheExchange({
           if (profitLoss > 0) toast({ title: "Nice Bet!", status: "success", description: `You won ${profitLoss} GBP!` });
           else toast({ title: "Oh No!", status: "warning", description: `You lost ${profitLoss} GBP :(` });
           return { me: user };
-        }),
+        });
+        const meme = cache.readFragment<RedditMemeFragment>(RedditMemeFragmentDoc, {
+          id: parent.placeBet.redditMemeId,
+          __typename: "RedditMemeEntity",
+        });
+        if (!meme) throw new Error("where meme?");
+        meme.redditBet = parent.placeBet;
+        cache.writeFragment(RedditMemeFragmentDoc, meme);
+      },
     },
   },
 });

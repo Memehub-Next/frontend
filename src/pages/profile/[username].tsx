@@ -32,11 +32,11 @@ const queryParamSchema = yup.object({
 
 interface PageProps extends yup.InferType<typeof queryParamSchema> {}
 
-export const getServerSideProps: GetServerSideProps<InferType<typeof queryParamSchema>> = async ({ query }) => {
+export const getServerSideProps: GetServerSideProps<InferType<typeof queryParamSchema>> = async (ctx) => {
   try {
-    const { username } = await queryParamSchema.validate(query, { strict: true });
+    const { username } = await queryParamSchema.validate(ctx.query, { strict: true });
     const ssrCache = ssrExchange({ isClient: false });
-    const client = initUrqlClient(nextUrqlClient(ssrCache), false);
+    const client = initUrqlClient(nextUrqlClient(ssrCache, ctx as any), false);
     if (!client) throw new Error("where URQL client?");
     await client.query(MeDocument, {}).toPromise();
     await client.query(GetCurrentSeasonIdDocument, {}).toPromise();

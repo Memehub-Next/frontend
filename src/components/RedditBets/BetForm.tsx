@@ -18,10 +18,9 @@ interface IFormValues {
 
 interface BetFormProps extends ButtonProps {
   redditMemeId: string;
-  done: () => void;
 }
 
-export const BetForm: React.FC<BetFormProps> = ({ redditMemeId, done }) => {
+export const BetForm: React.FC<BetFormProps> = ({ redditMemeId }) => {
   const redirect = useRedirect();
   const [isBuy, { toggle }] = useBoolean(true);
   const [{ data }] = useMeQuery();
@@ -40,7 +39,7 @@ export const BetForm: React.FC<BetFormProps> = ({ redditMemeId, done }) => {
       initialValues={{ betSize: 5, target: 50 }}
       validationSchema={validationSchema}
       onSubmit={({ betSize, target }) =>
-        placeBetFN({ betSize, redditMemeId, target, ePositionSide: isBuy ? EPositionSide.Buy : EPositionSide.Sell }).then(done)
+        placeBetFN({ betSize, redditMemeId, target, ePositionSide: isBuy ? EPositionSide.Buy : EPositionSide.Sell })
       }
     >
       {({ isSubmitting, values: { betSize, target }, setFieldValue }) => {
@@ -49,7 +48,7 @@ export const BetForm: React.FC<BetFormProps> = ({ redditMemeId, done }) => {
         const isYoloToMultiplier = isYolo ? 2 : 1;
         const potentialProfit = Math.round(betSize * targetToMultiplier) * isYoloToMultiplier;
         return (
-          <VStack p={1} as={Form} w="40%">
+          <VStack p={1} as={Form} w="50%">
             <HStack w="100%" justifyContent="space-between">
               <Tooltip shouldWrapChildren label="Bet it all, and get a 2x multiplier!">
                 <Checkbox

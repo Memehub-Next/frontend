@@ -17,15 +17,13 @@ import {
   MeDocument,
   MeQuery,
   MeQueryVariables,
-  RedditBetFragment,
-  useMyRedditBetQuery,
   useRandomRedditMemesQuery,
 } from "../graphql/urql-codegen";
 
-export const getServerSideProps: GetServerSideProps = async () => {
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
   try {
     const ssrCache = ssrExchange({ isClient: false });
-    const client = initUrqlClient(nextUrqlClient(ssrCache), false);
+    const client = initUrqlClient(nextUrqlClient(ssrCache, ctx as any), false);
     if (!client) throw new Error("where URQL client?");
     await client.query<MeQuery, MeQueryVariables>(MeDocument, {}).toPromise();
     for (const eLeaderboard of Object.values(ELeaderboard))
@@ -41,7 +39,8 @@ export const getServerSideProps: GetServerSideProps = async () => {
 const Page: NextPage = () => {
   const [index, setIndex] = useState(0);
   const [RandomRedditMemesResp, randomRedditMemesRefetch] = useRandomRedditMemesQuery({ variables: { take: 10 } });
-  const redditMemes = RandomRedditMemesResp.data?.randomRedditMemes || [];
+  const redditMemes = RandomRedditMemesResp.data?.randomRedditMemes || [undefined];
+  const currentMeme = redditMemes[index];
   return (
     <DoubleColLayout>
       <HStack w="100%" align="flex-start" px={2}>
@@ -62,7 +61,7 @@ const Page: NextPage = () => {
             </HStack>
           </Button>
           <Text noOfLines={1} textAlign="center">
-            {redditMemes[index]?.title}
+            {currentMeme?.title}
           </Text>
           <ImageWrapper
             isLoaded={Boolean(redditMemes[index])}
@@ -70,27 +69,16 @@ const Page: NextPage = () => {
             _hover={{ cursor: "pointer" }}
             px={2}
             maxH="60vh"
-            src={redditMemes[index]?.url}
+            src={currentMeme?.url}
           />
         </VStack>
-        <BetComponent redditMemeId={redditMemes[index]?.id ?? ""} redditBet={redditMemes[index]?.redditBet} />
+        {currentMeme?.redditBet ? (
+          <BetResultMenu size="xs" redditBet={currentMeme?.redditBet} />
+        ) : (
+          <BetForm redditMemeId={currentMeme?.id ?? ""} />
+        )}
       </HStack>
     </DoubleColLayout>
   );
 };
 export default withUrqlClient(nextUrqlClient)(Page);
-
-interface IBetComponent {
-  redditBet?: RedditBetFragment | null;
-  redditMemeId: string;
-}
-
-const BetComponent: React.FC<IBetComponent> = ({ redditBet, redditMemeId }) => {
-  const [{ data }, refetch] = useMyRedditBetQuery({ variables: { redditMemeId }, pause: true });
-  redditBet = data?.myRedditBet?.redditMemeId === redditMemeId ? data?.myRedditBet : redditBet;
-  return redditBet ? (
-    <BetResultMenu size="xs" redditBet={redditBet} />
-  ) : (
-    <BetForm redditMemeId={redditMemeId} done={() => refetch({ requestPolicy: "network-only" })} />
-  );
-};

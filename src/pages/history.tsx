@@ -1,4 +1,4 @@
-import { Center, HStack, VStack } from "@chakra-ui/react";
+import { HStack, VStack } from "@chakra-ui/react";
 import { NextPage } from "next";
 import { withUrqlClient } from "next-urql";
 import { useEffect, useState } from "react";
@@ -22,7 +22,6 @@ const Page: NextPage<PageProps> = () => {
   const { take, skip, loadMore, reset } = useSkipPagination(10);
   const [{ data }] = useLeaderboardQuery({ variables: { eLeaderboard, take, skip, seasonId } });
   useEffect(reset, [eLeaderboard, seasonId]);
-  console.log({ eLeaderboard, seasonId });
   return (
     <SingleColLayout>
       <VStack w="100%">
@@ -42,31 +41,27 @@ const Page: NextPage<PageProps> = () => {
             setSelected={setELeaderboard}
           />
         </HStack>
-        <VStack w="100%">
-          <Center>
-            <MyRank eLeaderboard={eLeaderboard} seasonId={seasonId} />
-            <InfiniteScroll
-              dataLength={data?.leaderboard.items.length || 6}
-              next={loadMore}
-              hasMore={Boolean(data?.leaderboard.hasMore)}
-              loader={loader}
-              endMessage={endMessage}
-            >
-              {(data?.leaderboard.items ?? Array<undefined>(6).fill(undefined)).map((leader, idx) => (
-                <Leader
-                  key={idx}
-                  rank={idx + 1}
-                  leader={leader}
-                  py={3}
-                  px={5}
-                  w="100%"
-                  justifyContent="space-between"
-                  _hover={{ backgroundColor: "gray.800", cursor: "pointer" }}
-                />
-              ))}
-            </InfiniteScroll>
-          </Center>
-        </VStack>
+        <InfiniteScroll
+          dataLength={data?.leaderboard.items.length || 6}
+          next={loadMore}
+          hasMore={Boolean(data?.leaderboard.hasMore)}
+          loader={loader}
+          endMessage={endMessage}
+        >
+          <MyRank eLeaderboard={eLeaderboard} seasonId={seasonId} />
+          {(data?.leaderboard.items ?? Array<undefined>(6).fill(undefined)).map((leader, idx) => (
+            <Leader
+              key={idx}
+              rank={idx + 1}
+              leader={leader}
+              py={3}
+              px={5}
+              w="100%"
+              justifyContent="space-between"
+              _hover={{ backgroundColor: "gray.800", cursor: "pointer" }}
+            />
+          ))}
+        </InfiniteScroll>
       </VStack>
     </SingleColLayout>
   );

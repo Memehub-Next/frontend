@@ -11,7 +11,7 @@ const leaderboards = Object.values(ELeaderboard);
 
 interface LeaderboardWidgetProps extends StackProps {}
 
-export const LeaderboardWidget: React.FC<LeaderboardWidgetProps> = React.memo((stackProps) => {
+export const LeaderboardWidget: React.FC<LeaderboardWidgetProps> = (stackProps) => {
   const redirect = useRedirect();
   const [index, setIndex] = useState(0);
   const [userCalled, { off, on }] = useBoolean(false);
@@ -55,4 +55,4 @@ export const LeaderboardWidget: React.FC<LeaderboardWidgetProps> = React.memo((s
       </VStack>
     </VStack>
   );
-});
+};
