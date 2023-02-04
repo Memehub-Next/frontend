@@ -1,7 +1,7 @@
 import { SkeletonText, Table, TableProps, Tbody, Td, Text, Tr } from "@chakra-ui/react";
 import React from "react";
 import { Omit } from "utility-types";
-import { SeasonSummaryFragment, useSeasonSummaryQuery } from "../../../graphql/urql-codegen";
+import { SeasonSummaryFragment, useSeasonSummaryQuery } from "../../graphql/urql-codegen";
 
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";

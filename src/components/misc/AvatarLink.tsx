@@ -1,15 +1,20 @@
 import { Avatar, AvatarProps, SkeletonCircle } from "@chakra-ui/react";
-import { useRedirect } from "../../hooks/useRedirect";
+import { useRouter } from "next/router";
 
 interface AvatarLinkProps extends AvatarProps {
   username?: string;
 }
 
 export const AvatarLink: React.FC<AvatarLinkProps> = ({ username, ...avatarProps }) => {
-  const redirect = useRedirect();
+  const router = useRouter();
   return (
     <SkeletonCircle isLoaded={Boolean(username)}>
-      <Avatar onClick={redirect(`/profile/${username}`)} border="1px solid white" _hover={{ cursor: "pointer" }} {...avatarProps} />
+      <Avatar
+        onClick={() => router.push(`/profile/${username}`)}
+        border="1px solid white"
+        _hover={{ cursor: "pointer" }}
+        {...avatarProps}
+      />
     </SkeletonCircle>
   );
 };

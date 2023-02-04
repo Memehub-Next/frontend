@@ -16,6 +16,16 @@ export type Scalars = {
   DateTime: any;
 };
 
+export type AllLeaderboardsDto = {
+  __typename?: 'AllLeaderboardsDTO';
+  bestTrade: Array<LeaderDto>;
+  daily: Array<LeaderDto>;
+  ever: Array<LeaderDto>;
+  largestYolo: Array<LeaderDto>;
+  season: Array<LeaderDto>;
+  weekly: Array<LeaderDto>;
+};
+
 export enum ELeaderboard {
   BestTrade = 'BestTrade',
   Daily = 'Daily',
@@ -49,8 +59,8 @@ export enum EUserRole {
   Hive = 'Hive'
 }
 
-export type LeaderboardDto = {
-  __typename?: 'LeaderboardDTO';
+export type LeaderDto = {
+  __typename?: 'LeaderDTO';
   avatar?: Maybe<Scalars['String']>;
   profitLoss: Scalars['Int'];
   rank: Scalars['Int'];
@@ -60,7 +70,7 @@ export type LeaderboardDto = {
 export type LeaderboardPdto = {
   __typename?: 'LeaderboardPDTO';
   hasMore: Scalars['Boolean'];
-  items: Array<LeaderboardDto>;
+  items: Array<LeaderDto>;
 };
 
 export type Mutation = {
@@ -99,16 +109,42 @@ export type MutationPlaceBetArgs = {
   target?: InputMaybe<Scalars['Int']>;
 };
 
+export type MyLeaderboardsDto = {
+  __typename?: 'MyLeaderboardsDTO';
+  bestTrade?: Maybe<LeaderDto>;
+  daily?: Maybe<LeaderDto>;
+  ever?: Maybe<LeaderDto>;
+  largestYolo?: Maybe<LeaderDto>;
+  season?: Maybe<LeaderDto>;
+  weekly?: Maybe<LeaderDto>;
+};
+
+export type PairArg = {
+  base: Scalars['String'];
+  quote: Scalars['String'];
+};
+
+export type PairPriceDto = {
+  __typename?: 'PairPriceDTO';
+  base: Scalars['String'];
+  price: Scalars['Float'];
+  quote: Scalars['String'];
+};
+
 export type Query = {
   __typename?: 'Query';
+  allLeaderboards: AllLeaderboardsDto;
   gbpBySeason: Scalars['Int'];
+  getCryptoPrices: Array<PairPriceDto>;
   getCurrentSeasonId: Scalars['Int'];
   getTradedRedditMemes: RedditMemePdto;
   leaderboard: LeaderboardPdto;
   me?: Maybe<UserEntity>;
-  myLeaderboard?: Maybe<LeaderboardDto>;
+  myLeaderboard?: Maybe<LeaderDto>;
+  myLeaderboards?: Maybe<MyLeaderboardsDto>;
   myRedditBet?: Maybe<RedditBetEntity>;
   randomRedditMemes: Array<RedditMemeEntity>;
+  redditMemeCount: Scalars['Int'];
   seasonSummary?: Maybe<SeasonSummaryDto>;
   totalGbp: Scalars['Int'];
   user?: Maybe<UserEntity>;
@@ -118,9 +154,19 @@ export type Query = {
 };
 
 
+export type QueryAllLeaderboardsArgs = {
+  take: Scalars['Int'];
+};
+
+
 export type QueryGbpBySeasonArgs = {
   seasonId?: InputMaybe<Scalars['Int']>;
   username: Scalars['String'];
+};
+
+
+export type QueryGetCryptoPricesArgs = {
+  pairs: Array<PairArg>;
 };
 
 
@@ -153,6 +199,7 @@ export type QueryMyRedditBetArgs = {
 
 
 export type QueryRandomRedditMemesArgs = {
+  skip: Scalars['Int'];
   take: Scalars['Int'];
 };
 
@@ -266,6 +313,15 @@ export type UserEntity = {
   wojakLevel: Scalars['Int'];
 };
 
+export type PairPriceDtoFragment = { __typename?: 'PairPriceDTO', base: string, quote: string, price: number };
+
+export type GetCryptoPricesQueryVariables = Exact<{
+  pairs: Array<PairArg> | PairArg;
+}>;
+
+
+export type GetCryptoPricesQuery = { __typename?: 'Query', getCryptoPrices: Array<{ __typename?: 'PairPriceDTO', base: string, quote: string, price: number }> };
+
 export type WojakLevelQueryVariables = Exact<{
   username: Scalars['String'];
 }>;
@@ -288,9 +344,13 @@ export type GbpBySeasonQueryVariables = Exact<{
 
 export type GbpBySeasonQuery = { __typename?: 'Query', gbpBySeason: number };
 
-export type LeaderFragment = { __typename?: 'LeaderboardDTO', username: string, avatar?: string | null, profitLoss: number, rank: number };
+export type LeaderFragment = { __typename?: 'LeaderDTO', username: string, avatar?: string | null, profitLoss: number, rank: number };
 
-export type LeaderboardPdtoFragment = { __typename?: 'LeaderboardPDTO', hasMore: boolean, items: Array<{ __typename?: 'LeaderboardDTO', username: string, avatar?: string | null, profitLoss: number, rank: number }> };
+export type LeaderboardPdtoFragment = { __typename?: 'LeaderboardPDTO', hasMore: boolean, items: Array<{ __typename?: 'LeaderDTO', username: string, avatar?: string | null, profitLoss: number, rank: number }> };
+
+export type AllLeaderboardsDtoFragment = { __typename?: 'AllLeaderboardsDTO', daily: Array<{ __typename?: 'LeaderDTO', username: string, avatar?: string | null, profitLoss: number, rank: number }>, weekly: Array<{ __typename?: 'LeaderDTO', username: string, avatar?: string | null, profitLoss: number, rank: number }>, season: Array<{ __typename?: 'LeaderDTO', username: string, avatar?: string | null, profitLoss: number, rank: number }>, ever: Array<{ __typename?: 'LeaderDTO', username: string, avatar?: string | null, profitLoss: number, rank: number }>, bestTrade: Array<{ __typename?: 'LeaderDTO', username: string, avatar?: string | null, profitLoss: number, rank: number }>, largestYolo: Array<{ __typename?: 'LeaderDTO', username: string, avatar?: string | null, profitLoss: number, rank: number }> };
+
+export type MyLeaderboardsDtoFragment = { __typename?: 'MyLeaderboardsDTO', daily?: { __typename?: 'LeaderDTO', username: string, avatar?: string | null, profitLoss: number, rank: number } | null, weekly?: { __typename?: 'LeaderDTO', username: string, avatar?: string | null, profitLoss: number, rank: number } | null, season?: { __typename?: 'LeaderDTO', username: string, avatar?: string | null, profitLoss: number, rank: number } | null, ever?: { __typename?: 'LeaderDTO', username: string, avatar?: string | null, profitLoss: number, rank: number } | null, bestTrade?: { __typename?: 'LeaderDTO', username: string, avatar?: string | null, profitLoss: number, rank: number } | null, largestYolo?: { __typename?: 'LeaderDTO', username: string, avatar?: string | null, profitLoss: number, rank: number } | null };
 
 export type LeaderboardQueryVariables = Exact<{
   eLeaderboard: ELeaderboard;
@@ -300,7 +360,14 @@ export type LeaderboardQueryVariables = Exact<{
 }>;
 
 
-export type LeaderboardQuery = { __typename?: 'Query', leaderboard: { __typename?: 'LeaderboardPDTO', hasMore: boolean, items: Array<{ __typename?: 'LeaderboardDTO', username: string, avatar?: string | null, profitLoss: number, rank: number }> } };
+export type LeaderboardQuery = { __typename?: 'Query', leaderboard: { __typename?: 'LeaderboardPDTO', hasMore: boolean, items: Array<{ __typename?: 'LeaderDTO', username: string, avatar?: string | null, profitLoss: number, rank: number }> } };
+
+export type AllLeaderboardsQueryVariables = Exact<{
+  take: Scalars['Int'];
+}>;
+
+
+export type AllLeaderboardsQuery = { __typename?: 'Query', allLeaderboards: { __typename?: 'AllLeaderboardsDTO', daily: Array<{ __typename?: 'LeaderDTO', username: string, avatar?: string | null, profitLoss: number, rank: number }>, weekly: Array<{ __typename?: 'LeaderDTO', username: string, avatar?: string | null, profitLoss: number, rank: number }>, season: Array<{ __typename?: 'LeaderDTO', username: string, avatar?: string | null, profitLoss: number, rank: number }>, ever: Array<{ __typename?: 'LeaderDTO', username: string, avatar?: string | null, profitLoss: number, rank: number }>, bestTrade: Array<{ __typename?: 'LeaderDTO', username: string, avatar?: string | null, profitLoss: number, rank: number }>, largestYolo: Array<{ __typename?: 'LeaderDTO', username: string, avatar?: string | null, profitLoss: number, rank: number }> } };
 
 export type MyLeaderboardQueryVariables = Exact<{
   eLeaderboard: ELeaderboard;
@@ -308,7 +375,12 @@ export type MyLeaderboardQueryVariables = Exact<{
 }>;
 
 
-export type MyLeaderboardQuery = { __typename?: 'Query', myLeaderboard?: { __typename?: 'LeaderboardDTO', username: string, avatar?: string | null, profitLoss: number, rank: number } | null };
+export type MyLeaderboardQuery = { __typename?: 'Query', myLeaderboard?: { __typename?: 'LeaderDTO', username: string, avatar?: string | null, profitLoss: number, rank: number } | null };
+
+export type MyLeaderboardsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MyLeaderboardsQuery = { __typename?: 'Query', myLeaderboards?: { __typename?: 'MyLeaderboardsDTO', daily?: { __typename?: 'LeaderDTO', username: string, avatar?: string | null, profitLoss: number, rank: number } | null, weekly?: { __typename?: 'LeaderDTO', username: string, avatar?: string | null, profitLoss: number, rank: number } | null, season?: { __typename?: 'LeaderDTO', username: string, avatar?: string | null, profitLoss: number, rank: number } | null, ever?: { __typename?: 'LeaderDTO', username: string, avatar?: string | null, profitLoss: number, rank: number } | null, bestTrade?: { __typename?: 'LeaderDTO', username: string, avatar?: string | null, profitLoss: number, rank: number } | null, largestYolo?: { __typename?: 'LeaderDTO', username: string, avatar?: string | null, profitLoss: number, rank: number } | null } | null };
 
 export type RedditBetFragment = { __typename?: 'RedditBetEntity', id: string, redditMemeId: string, betSize: number, target?: number | null, percentile: number, username: string, createdAt: any, profitLoss: number, isYolo: boolean, side: EPositionSide };
 
@@ -359,16 +431,22 @@ export type PlaceBetMutationVariables = Exact<{
 
 export type PlaceBetMutation = { __typename?: 'Mutation', placeBet: { __typename?: 'RedditBetEntity', id: string, redditMemeId: string, betSize: number, target?: number | null, percentile: number, username: string, createdAt: any, profitLoss: number, isYolo: boolean, side: EPositionSide } };
 
-export type RedditMemeFragment = { __typename?: 'RedditMemeEntity', id: string, title: string, subreddit: string, url: string, redditId: string, redditBet?: { __typename?: 'RedditBetEntity', id: string, redditMemeId: string, betSize: number, target?: number | null, percentile: number, username: string, createdAt: any, profitLoss: number, isYolo: boolean, side: EPositionSide } | null };
+export type RedditMemeFragment = { __typename?: 'RedditMemeEntity', id: string, title: string, subreddit: string, url: string, redditId: string, percentile?: number | null, redditBet?: { __typename?: 'RedditBetEntity', id: string, redditMemeId: string, betSize: number, target?: number | null, percentile: number, username: string, createdAt: any, profitLoss: number, isYolo: boolean, side: EPositionSide } | null };
 
-export type PaginatedRedditMemesFragment = { __typename?: 'RedditMemePDTO', hasMore: boolean, items: Array<{ __typename?: 'RedditMemeEntity', id: string, title: string, subreddit: string, url: string, redditId: string, redditBet?: { __typename?: 'RedditBetEntity', id: string, redditMemeId: string, betSize: number, target?: number | null, percentile: number, username: string, createdAt: any, profitLoss: number, isYolo: boolean, side: EPositionSide } | null }> };
+export type PaginatedRedditMemesFragment = { __typename?: 'RedditMemePDTO', hasMore: boolean, items: Array<{ __typename?: 'RedditMemeEntity', id: string, title: string, subreddit: string, url: string, redditId: string, percentile?: number | null, redditBet?: { __typename?: 'RedditBetEntity', id: string, redditMemeId: string, betSize: number, target?: number | null, percentile: number, username: string, createdAt: any, profitLoss: number, isYolo: boolean, side: EPositionSide } | null }> };
+
+export type RedditMemeCountQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type RedditMemeCountQuery = { __typename?: 'Query', redditMemeCount: number };
 
 export type RandomRedditMemesQueryVariables = Exact<{
   take: Scalars['Int'];
+  skip: Scalars['Int'];
 }>;
 
 
-export type RandomRedditMemesQuery = { __typename?: 'Query', randomRedditMemes: Array<{ __typename?: 'RedditMemeEntity', id: string, title: string, subreddit: string, url: string, redditId: string, redditBet?: { __typename?: 'RedditBetEntity', id: string, redditMemeId: string, betSize: number, target?: number | null, percentile: number, username: string, createdAt: any, profitLoss: number, isYolo: boolean, side: EPositionSide } | null }> };
+export type RandomRedditMemesQuery = { __typename?: 'Query', randomRedditMemes: Array<{ __typename?: 'RedditMemeEntity', id: string, title: string, subreddit: string, url: string, redditId: string, percentile?: number | null, redditBet?: { __typename?: 'RedditBetEntity', id: string, redditMemeId: string, betSize: number, target?: number | null, percentile: number, username: string, createdAt: any, profitLoss: number, isYolo: boolean, side: EPositionSide } | null }> };
 
 export type GetCurrentSeasonIdQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -421,8 +499,15 @@ export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
 
 export type LogoutMutation = { __typename?: 'Mutation', logout: boolean };
 
+export const PairPriceDtoFragmentDoc = gql`
+    fragment pairPriceDTO on PairPriceDTO {
+  base
+  quote
+  price
+}
+    `;
 export const LeaderFragmentDoc = gql`
-    fragment leader on LeaderboardDTO {
+    fragment leader on LeaderDTO {
   username
   avatar
   profitLoss
@@ -435,6 +520,50 @@ export const LeaderboardPdtoFragmentDoc = gql`
     ...leader
   }
   hasMore
+}
+    ${LeaderFragmentDoc}`;
+export const AllLeaderboardsDtoFragmentDoc = gql`
+    fragment allLeaderboardsDTO on AllLeaderboardsDTO {
+  daily {
+    ...leader
+  }
+  weekly {
+    ...leader
+  }
+  season {
+    ...leader
+  }
+  ever {
+    ...leader
+  }
+  bestTrade {
+    ...leader
+  }
+  largestYolo {
+    ...leader
+  }
+}
+    ${LeaderFragmentDoc}`;
+export const MyLeaderboardsDtoFragmentDoc = gql`
+    fragment myLeaderboardsDTO on MyLeaderboardsDTO {
+  daily {
+    ...leader
+  }
+  weekly {
+    ...leader
+  }
+  season {
+    ...leader
+  }
+  ever {
+    ...leader
+  }
+  bestTrade {
+    ...leader
+  }
+  largestYolo {
+    ...leader
+  }
 }
     ${LeaderFragmentDoc}`;
 export const RedditBetFragmentDoc = gql`
@@ -475,6 +604,7 @@ export const RedditMemeFragmentDoc = gql`
   subreddit
   url
   redditId
+  percentile
   redditBet {
     ...redditBet
   }
@@ -510,6 +640,17 @@ export const UserFragmentDoc = gql`
   wojakLevel
 }
     `;
+export const GetCryptoPricesDocument = gql`
+    query GetCryptoPrices($pairs: [PairArg!]!) {
+  getCryptoPrices(pairs: $pairs) {
+    ...pairPriceDTO
+  }
+}
+    ${PairPriceDtoFragmentDoc}`;
+
+export function useGetCryptoPricesQuery(options: Omit<Urql.UseQueryArgs<GetCryptoPricesQueryVariables>, 'query'>) {
+  return Urql.useQuery<GetCryptoPricesQuery, GetCryptoPricesQueryVariables>({ query: GetCryptoPricesDocument, ...options });
+};
 export const WojakLevelDocument = gql`
     query WojakLevel($username: String!) {
   wojakLevel(username: $username)
@@ -553,6 +694,17 @@ export const LeaderboardDocument = gql`
 export function useLeaderboardQuery(options: Omit<Urql.UseQueryArgs<LeaderboardQueryVariables>, 'query'>) {
   return Urql.useQuery<LeaderboardQuery, LeaderboardQueryVariables>({ query: LeaderboardDocument, ...options });
 };
+export const AllLeaderboardsDocument = gql`
+    query AllLeaderboards($take: Int!) {
+  allLeaderboards(take: $take) {
+    ...allLeaderboardsDTO
+  }
+}
+    ${AllLeaderboardsDtoFragmentDoc}`;
+
+export function useAllLeaderboardsQuery(options: Omit<Urql.UseQueryArgs<AllLeaderboardsQueryVariables>, 'query'>) {
+  return Urql.useQuery<AllLeaderboardsQuery, AllLeaderboardsQueryVariables>({ query: AllLeaderboardsDocument, ...options });
+};
 export const MyLeaderboardDocument = gql`
     query MyLeaderboard($eLeaderboard: ELeaderboard!, $seasonId: Int) {
   myLeaderboard(eLeaderboard: $eLeaderboard, seasonId: $seasonId) {
@@ -563,6 +715,17 @@ export const MyLeaderboardDocument = gql`
 
 export function useMyLeaderboardQuery(options: Omit<Urql.UseQueryArgs<MyLeaderboardQueryVariables>, 'query'>) {
   return Urql.useQuery<MyLeaderboardQuery, MyLeaderboardQueryVariables>({ query: MyLeaderboardDocument, ...options });
+};
+export const MyLeaderboardsDocument = gql`
+    query MyLeaderboards {
+  myLeaderboards {
+    ...myLeaderboardsDTO
+  }
+}
+    ${MyLeaderboardsDtoFragmentDoc}`;
+
+export function useMyLeaderboardsQuery(options?: Omit<Urql.UseQueryArgs<MyLeaderboardsQueryVariables>, 'query'>) {
+  return Urql.useQuery<MyLeaderboardsQuery, MyLeaderboardsQueryVariables>({ query: MyLeaderboardsDocument, ...options });
 };
 export const UserRedditBetsPaginatedDocument = gql`
     query UserRedditBetsPaginated($take: Int!, $skip: Int!, $eRedditBetOrder: ERedditBetOrder!, $username: String!, $isASC: Boolean!, $isYolo: Boolean, $seasonId: Int, $ePositionSide: EPositionSide) {
@@ -628,9 +791,18 @@ export const PlaceBetDocument = gql`
 export function usePlaceBetMutation() {
   return Urql.useMutation<PlaceBetMutation, PlaceBetMutationVariables>(PlaceBetDocument);
 };
+export const RedditMemeCountDocument = gql`
+    query RedditMemeCount {
+  redditMemeCount
+}
+    `;
+
+export function useRedditMemeCountQuery(options?: Omit<Urql.UseQueryArgs<RedditMemeCountQueryVariables>, 'query'>) {
+  return Urql.useQuery<RedditMemeCountQuery, RedditMemeCountQueryVariables>({ query: RedditMemeCountDocument, ...options });
+};
 export const RandomRedditMemesDocument = gql`
-    query RandomRedditMemes($take: Int!) {
-  randomRedditMemes(take: $take) {
+    query RandomRedditMemes($take: Int!, $skip: Int!) {
+  randomRedditMemes(take: $take, skip: $skip) {
     ...redditMeme
   }
 }

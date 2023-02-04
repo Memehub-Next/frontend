@@ -1,9 +1,11 @@
 import { Button, Divider, HStack, Link, Text, VStack } from "@chakra-ui/react";
 import { Form, Formik } from "formik";
-import { NextPage } from "next";
+import { GetServerSideProps, NextPage } from "next";
 import { withUrqlClient } from "next-urql";
+import { getSelectorsByUserAgent } from "react-device-detect";
 import * as yup from "yup";
 import InputField from "../../components/formik/InputField";
+import { ELayout, getServerSideLayoutProps } from "../../components/layout/getServerSideLayoutProps";
 import { SingleColLayout } from "../../components/layout/singleColLayout";
 import { nextUrqlClient } from "../../graphql/urql-client/nextUrqlClient";
 import { useHiveLoginMutation } from "../../graphql/urql-codegen";
@@ -15,8 +17,21 @@ const validationSchema = yup.object({
 });
 const initialValues: yup.InferType<typeof validationSchema> = { username: "" };
 
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  try {
+    const userAgent = ctx.req.headers["user-agent"] as string;
+    const { isMobile } = getSelectorsByUserAgent(userAgent);
+    if (isMobile) return { redirect: { permanent: false, destination: "/about/mobile" } };
+    const { ssrCache } = await getServerSideLayoutProps(ctx, ELayout.DoubleColumn);
+    return { props: { urqlState: ssrCache.extractData() } };
+  } catch (error) {
+    console.error(error);
+    return { redirect: { permanent: false, destination: "/auth/login" } };
+  }
+};
+
 const Page: NextPage = () => {
-  const { isLoading, isInstalled } = useHiveKeychain();
+  const { isInstalled } = useHiveKeychain();
   const [, loginFN] = useHiveLoginMutation();
   return (
     <SingleColLayout>
@@ -47,7 +62,7 @@ const Page: NextPage = () => {
           {({ isSubmitting }) => (
             <VStack as={Form} w={{ base: "90%", sm: "50%", md: "50%", lg: "20%", xl: "20%" }}>
               <InputField placeholder="Username" name="username" />
-              <Button w="100%" isDisabled={isLoading || !isInstalled} isLoading={isSubmitting} type="submit">
+              <Button w="100%" isDisabled={!isInstalled} isLoading={isSubmitting} type="submit">
                 Hive Keychain Login
               </Button>
               <Text>If the Login button is not active then:</Text>
@@ -62,4 +77,4 @@ const Page: NextPage = () => {
   );
 };
 
-export default withUrqlClient(nextUrqlClient, { ssr: false })(Page);
+export default withUrqlClient(nextUrqlClient)(Page);

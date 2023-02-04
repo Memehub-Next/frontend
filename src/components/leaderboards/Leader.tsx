@@ -5,14 +5,13 @@ import { DEFAULT_AVATAR } from "../../utils/constants";
 import { AvatarLink } from "../misc/AvatarLink";
 
 interface LeaderProps extends StackProps {
-  rank: number;
   leader?: LeaderFragment;
 }
 
-export const Leader: React.FC<LeaderProps> = ({ rank, leader, ...stackProps }) => (
-  <HStack {...stackProps}>
+export const Leader: React.FC<LeaderProps> = ({ leader, ...stackProps }) => (
+  <HStack py={3} px={5} w="100%" justifyContent="space-between" _hover={{ backgroundColor: "gray.800", cursor: "pointer" }} {...stackProps}>
     <HStack spacing={3}>
-      <RankMedal rank={leader?.rank ?? rank} />
+      <RankMedal rank={leader?.rank} />
       <HStack>
         <AvatarLink src={leader?.avatar || DEFAULT_AVATAR} username={leader?.username} border="1px solid white" size="sm" />
         <Text noOfLines={1} maxW="100%">
@@ -30,7 +29,7 @@ export const Leader: React.FC<LeaderProps> = ({ rank, leader, ...stackProps }) =
 );
 
 interface RankMedalProps {
-  rank: number;
+  rank?: number;
 }
 
 const RankMedal: React.FC<RankMedalProps> = ({ rank }) => {
@@ -44,7 +43,7 @@ const RankMedal: React.FC<RankMedalProps> = ({ rank }) => {
     default:
       return (
         <Center h={8} w={12}>
-          <Text noOfLines={1}>{Humanize.compactInteger(rank, 1)}</Text>
+          <Text noOfLines={1}>{typeof rank === "undefined" ? 0 : Humanize.compactInteger(rank, 1)}</Text>
         </Center>
       );
   }

@@ -5,6 +5,7 @@ fragment redditMeme on RedditMemeEntity {
   subreddit
   url
   redditId
+  percentile
   redditBet {
     ...redditBet
   }
@@ -17,8 +18,12 @@ fragment paginatedRedditMemes on RedditMemePDTO {
   hasMore
 }
 
-query RandomRedditMemes($take: Int!) {
-  randomRedditMemes(take: $take) {
+query RedditMemeCount {
+  redditMemeCount
+}
+
+query RandomRedditMemes($take: Int!, $skip: Int!) {
+  randomRedditMemes(take: $take, skip: $skip) {
     ...redditMeme
   }
 }

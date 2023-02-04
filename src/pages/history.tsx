@@ -1,32 +1,81 @@
-import { HStack, VStack } from "@chakra-ui/react";
-import { NextPage } from "next";
+import { Divider, HStack, VStack } from "@chakra-ui/react";
+import { GetServerSideProps, NextPage } from "next";
 import { withUrqlClient } from "next-urql";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { getSelectorsByUserAgent } from "react-device-detect";
 import InfiniteScroll from "react-infinite-scroll-component";
+import { ELayout, getServerSideLayoutProps } from "../components/layout/getServerSideLayoutProps";
 import { SingleColLayout } from "../components/layout/singleColLayout";
 import { Leader } from "../components/leaderboards/Leader";
-import { MyRank } from "../components/leaderboards/MyRank";
 import { endMessage } from "../components/misc/endMessage";
 import { EnumSelect } from "../components/misc/EnumOptions";
 import { loader } from "../components/misc/loader";
-import { SeasonNumberInput } from "../components/RedditBets/SeasonNumberInput";
+import { NumberInputWrapper } from "../components/misc/NumberInputWrapper";
 import { nextUrqlClient } from "../graphql/urql-client/nextUrqlClient";
-import { ELeaderboard, useLeaderboardQuery } from "../graphql/urql-codegen";
+import {
+  ELeaderboard,
+  LeaderboardDocument,
+  LeaderboardQuery,
+  LeaderboardQueryVariables,
+  MyLeaderboardDocument,
+  MyLeaderboardQuery,
+  MyLeaderboardQueryVariables,
+  useGetCurrentSeasonIdQuery,
+  useLeaderboardQuery,
+  useMyLeaderboardQuery,
+} from "../graphql/urql-codegen";
 import { useSkipPagination } from "../hooks/useSkipPagination";
 
 interface PageProps {}
 
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  try {
+    const userAgent = ctx.req.headers["user-agent"] as string;
+    const { isMobile } = getSelectorsByUserAgent(userAgent);
+    if (isMobile) return { redirect: { permanent: false, destination: "/about/mobile" } };
+    const { ssrCache, client, seasonId } = await getServerSideLayoutProps(ctx, ELayout.SingleColumn);
+    for (const eLeaderboard of Object.values(ELeaderboard)) {
+      await client.query<MyLeaderboardQuery, MyLeaderboardQueryVariables>(MyLeaderboardDocument, { eLeaderboard, seasonId }).toPromise();
+      await client
+        .query<LeaderboardQuery, LeaderboardQueryVariables>(LeaderboardDocument, {
+          eLeaderboard,
+          take: 10,
+          skip: 0,
+          seasonId,
+        })
+        .toPromise();
+    }
+    return { props: { urqlState: ssrCache.extractData() } };
+  } catch (error) {
+    console.error(error);
+    return { redirect: { permanent: false, destination: "/auth/login" } };
+  }
+};
+
 const Page: NextPage<PageProps> = () => {
-  const [seasonId, setSeasonId] = useState<number>();
+  const [seasonIdResp] = useGetCurrentSeasonIdQuery();
+  const [seasonId, setSeasonId] = useState(seasonIdResp.data?.getCurrentSeasonId);
   const [eLeaderboard, setELeaderboard] = useState(ELeaderboard.BestTrade);
-  const { take, skip, loadMore, reset } = useSkipPagination(10);
+  const { take, skip, loadMore, reset: resetSkip } = useSkipPagination(10);
   const [{ data }] = useLeaderboardQuery({ variables: { eLeaderboard, take, skip, seasonId } });
-  useEffect(reset, [eLeaderboard, seasonId]);
+  const [myLeaderboardResp] = useMyLeaderboardQuery({ variables: { eLeaderboard, seasonId } });
   return (
     <SingleColLayout>
       <VStack w="100%">
         <HStack>
-          <SeasonNumberInput seasonId={seasonId} setSeasonId={setSeasonId} />
+          <NumberInputWrapper
+            size="xs"
+            step={1}
+            min={1}
+            max={seasonIdResp.data?.getCurrentSeasonId}
+            defaultValue={seasonId}
+            value={seasonId}
+            onChange={(seasonId) => {
+              setSeasonId(seasonId);
+              resetSkip();
+            }}
+            prefix="Season "
+          />
           <EnumSelect
             eEnumToLabel={{
               [ELeaderboard.BestTrade]: "Best Trade",
@@ -38,7 +87,10 @@ const Page: NextPage<PageProps> = () => {
             }}
             size="xs"
             eEnum={ELeaderboard}
-            setSelected={setELeaderboard}
+            setSelected={(eLeaderboard) => {
+              setELeaderboard(eLeaderboard);
+              resetSkip();
+            }}
           />
         </HStack>
         <InfiniteScroll
@@ -48,18 +100,14 @@ const Page: NextPage<PageProps> = () => {
           loader={loader}
           endMessage={endMessage}
         >
-          <MyRank eLeaderboard={eLeaderboard} seasonId={seasonId} />
+          {myLeaderboardResp.data?.myLeaderboard && myLeaderboardResp.data.myLeaderboard.rank > 3 && (
+            <>
+              <Leader leader={myLeaderboardResp.data.myLeaderboard} />
+              <Divider />
+            </>
+          )}
           {(data?.leaderboard.items ?? Array<undefined>(6).fill(undefined)).map((leader, idx) => (
-            <Leader
-              key={idx}
-              rank={idx + 1}
-              leader={leader}
-              py={3}
-              px={5}
-              w="100%"
-              justifyContent="space-between"
-              _hover={{ backgroundColor: "gray.800", cursor: "pointer" }}
-            />
+            <Leader key={idx} leader={leader} />
           ))}
         </InfiniteScroll>
       </VStack>
@@ -67,4 +115,4 @@ const Page: NextPage<PageProps> = () => {
   );
 };
 
-export default withUrqlClient(nextUrqlClient, { ssr: false })(Page);
+export default withUrqlClient(nextUrqlClient)(Page);

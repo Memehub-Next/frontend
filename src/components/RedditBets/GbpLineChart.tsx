@@ -1,7 +1,7 @@
 import { Skeleton, VStack } from "@chakra-ui/react";
 import { ResponsiveLine } from "@nivo/line";
 import React from "react";
-import { RedditBetFragment, useGbpBySeasonQuery } from "../../../graphql/urql-codegen";
+import { RedditBetFragment, useGbpBySeasonQuery } from "../../graphql/urql-codegen";
 
 interface GbpLineChartProps {
   username: string;

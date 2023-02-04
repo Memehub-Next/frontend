@@ -1,56 +1,71 @@
-import { Button, HStack, Text, VStack } from "@chakra-ui/react";
+import { Button, HStack, Stack, Text, VStack } from "@chakra-ui/react";
 import { GetServerSideProps, NextPage } from "next";
-import { initUrqlClient, withUrqlClient } from "next-urql";
+import { withUrqlClient } from "next-urql";
 import { useState } from "react";
+import { getSelectorsByUserAgent } from "react-device-detect";
 import { BiRightArrowAlt } from "react-icons/bi";
 import { nextUrqlClient } from "src/graphql/urql-client/nextUrqlClient";
-import { ssrExchange } from "urql";
 import { DoubleColLayout } from "../components/layout/doubleColLayout";
+import { ELayout, getServerSideLayoutProps } from "../components/layout/getServerSideLayoutProps";
 import { ImageWrapper } from "../components/misc/ImageWrapper";
 import { BetForm } from "../components/RedditBets/BetForm";
 import { BetResultMenu } from "../components/RedditBets/BetResultMenu";
 import {
-  ELeaderboard,
-  LeaderboardDocument,
-  LeaderboardQuery,
-  LeaderboardQueryVariables,
-  MeDocument,
-  MeQuery,
-  MeQueryVariables,
+  RandomRedditMemesDocument,
+  RandomRedditMemesQuery,
+  RandomRedditMemesQueryVariables,
+  RedditMemeCountDocument,
+  RedditMemeCountQuery,
+  RedditMemeCountQueryVariables,
   useRandomRedditMemesQuery,
 } from "../graphql/urql-codegen";
 
+function between(min: number, max: number) {
+  return Math.floor(Math.random() * (max - min) + min);
+}
+
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   try {
-    const ssrCache = ssrExchange({ isClient: false });
-    const client = initUrqlClient(nextUrqlClient(ssrCache, ctx as any), false);
-    if (!client) throw new Error("where URQL client?");
-    await client.query<MeQuery, MeQueryVariables>(MeDocument, {}).toPromise();
-    for (const eLeaderboard of Object.values(ELeaderboard))
-      await client.query<LeaderboardQuery, LeaderboardQueryVariables>(LeaderboardDocument, { eLeaderboard, take: 3, skip: 0 }).toPromise();
-    // await client.query<RandomRedditMemesQuery, RandomRedditMemesQueryVariables>(RandomRedditMemesDocument, { take: 10 }).toPromise();
-    return { props: { urqlState: ssrCache.extractData() } };
+    const userAgent = ctx.req.headers["user-agent"] as string;
+    const { isMobile } = getSelectorsByUserAgent(userAgent);
+    if (isMobile) return { redirect: { permanent: false, destination: "/about/mobile" } };
+    const { ssrCache, client } = await getServerSideLayoutProps(ctx, ELayout.DoubleColumn);
+    const { data } = await client.query<RedditMemeCountQuery, RedditMemeCountQueryVariables>(RedditMemeCountDocument, {}).toPromise();
+    if (!data?.redditMemeCount) throw new Error("back reddit meme count");
+    const maxSkip = data?.redditMemeCount - 10;
+    const initialSkip = between(0, maxSkip);
+    await client
+      .query<RandomRedditMemesQuery, RandomRedditMemesQueryVariables>(RandomRedditMemesDocument, { take: 10, skip: initialSkip })
+      .toPromise();
+    return { props: { initialSkip, maxSkip, urqlState: ssrCache.extractData() } };
   } catch (error) {
     console.error(error);
     return { redirect: { permanent: false, destination: "/auth/login" } };
   }
 };
 
-const Page: NextPage = () => {
+interface PageProps {
+  initialSkip: number;
+  maxSkip: number;
+}
+
+const Page: NextPage<PageProps> = ({ initialSkip, maxSkip }) => {
   const [index, setIndex] = useState(0);
-  const [RandomRedditMemesResp, randomRedditMemesRefetch] = useRandomRedditMemesQuery({ variables: { take: 10 } });
+  const [skip, setSkip] = useState(initialSkip);
+  const [RandomRedditMemesResp] = useRandomRedditMemesQuery({ variables: { take: 10, skip } });
   const redditMemes = RandomRedditMemesResp.data?.randomRedditMemes || [undefined];
   const currentMeme = redditMemes[index];
   return (
     <DoubleColLayout>
-      <HStack w="100%" align="flex-start" px={2}>
+      <Stack direction={{ base: "column", md: "row" }} h="85vh" w="100%" px={2}>
         <VStack w="100%" p={2}>
           <Button
             size="xs"
+            isDisabled={RandomRedditMemesResp.fetching}
             onClick={() =>
               setIndex((i) => {
                 if (i !== 9) return i + 1;
-                randomRedditMemesRefetch({ requestPolicy: "network-only" });
+                setSkip(between(0, maxSkip));
                 return 0;
               })
             }
@@ -64,7 +79,7 @@ const Page: NextPage = () => {
             {currentMeme?.title}
           </Text>
           <ImageWrapper
-            isLoaded={Boolean(redditMemes[index])}
+            isLoaded={Boolean(currentMeme && !RandomRedditMemesResp.fetching)}
             skeleton={{ w: "15rem", h: "15rem" }}
             _hover={{ cursor: "pointer" }}
             px={2}
@@ -72,12 +87,8 @@ const Page: NextPage = () => {
             src={currentMeme?.url}
           />
         </VStack>
-        {currentMeme?.redditBet ? (
-          <BetResultMenu size="xs" redditBet={currentMeme?.redditBet} />
-        ) : (
-          <BetForm redditMemeId={currentMeme?.id ?? ""} />
-        )}
-      </HStack>
+        {currentMeme?.redditBet ? <BetResultMenu size="xs" redditBet={currentMeme?.redditBet} /> : <BetForm redditMeme={currentMeme} />}
+      </Stack>
     </DoubleColLayout>
   );
 };

@@ -1,5 +1,5 @@
 # Leaderboard
-fragment leader on LeaderboardDTO {
+fragment leader on LeaderDTO {
   username
   avatar
   profitLoss
@@ -13,14 +13,68 @@ fragment leaderboardPDTO on LeaderboardPDTO {
   hasMore
 }
 
+fragment allLeaderboardsDTO on AllLeaderboardsDTO {
+  daily {
+    ...leader
+  }
+  weekly {
+    ...leader
+  }
+  season {
+    ...leader
+  }
+  ever {
+    ...leader
+  }
+  bestTrade {
+    ...leader
+  }
+  largestYolo {
+    ...leader
+  }
+}
+
+fragment myLeaderboardsDTO on MyLeaderboardsDTO {
+  daily {
+    ...leader
+  }
+  weekly {
+    ...leader
+  }
+  season {
+    ...leader
+  }
+  ever {
+    ...leader
+  }
+  bestTrade {
+    ...leader
+  }
+  largestYolo {
+    ...leader
+  }
+}
+
 query Leaderboard($eLeaderboard: ELeaderboard!, $take: Int!, $skip: Int!, $seasonId: Int) {
   leaderboard(eLeaderboard: $eLeaderboard, take: $take, skip: $skip, seasonId: $seasonId) {
     ...leaderboardPDTO
   }
 }
 
+query AllLeaderboards($take: Int!) {
+  allLeaderboards(take: $take) {
+    ...allLeaderboardsDTO
+  }
+}
+
 query MyLeaderboard($eLeaderboard: ELeaderboard!, $seasonId: Int) {
   myLeaderboard(eLeaderboard: $eLeaderboard, seasonId: $seasonId) {
     ...leader
+  }
+}
+
+query MyLeaderboards {
+  myLeaderboards {
+    ...myLeaderboardsDTO
   }
 }

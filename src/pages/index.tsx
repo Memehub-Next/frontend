@@ -1,9 +1,24 @@
 import { Button, Center, Flex, Text, VStack } from "@chakra-ui/react";
-import { NextPage } from "next";
+import { GetServerSideProps, NextPage } from "next";
 import { withUrqlClient } from "next-urql";
 import Link from "next/link";
+import { getSelectorsByUserAgent } from "react-device-detect";
 import { DoubleColLayout } from "../components/layout/doubleColLayout";
+import { ELayout, getServerSideLayoutProps } from "../components/layout/getServerSideLayoutProps";
 import { nextUrqlClient } from "../graphql/urql-client/nextUrqlClient";
+
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  try {
+    const userAgent = ctx.req.headers["user-agent"] as string;
+    const { isMobile } = getSelectorsByUserAgent(userAgent);
+    if (isMobile) return { redirect: { permanent: false, destination: "/about/mobile" } };
+    const { ssrCache } = await getServerSideLayoutProps(ctx, ELayout.DoubleColumn);
+    return { props: { urqlState: ssrCache.extractData() } };
+  } catch (error) {
+    console.error(error);
+    return { redirect: { permanent: false, destination: "/auth/login" } };
+  }
+};
 
 const Page: NextPage = () => (
   <DoubleColLayout>
@@ -24,10 +39,12 @@ const Page: NextPage = () => (
           <Button size="xs" variant="icon" as={Link} href="https://hive-keychain.com/" target="blank">
             Install Hive Keychain
           </Button>
-          <Text>Join us on discord</Text>
+          <Button size="xs" as={Link} href="https://discord.gg/QAcbE7Y" target="_blank" variant="icon">
+            Join us on discord
+          </Button>
         </Flex>
       </VStack>
     </Center>
   </DoubleColLayout>
 );
-export default withUrqlClient(nextUrqlClient, { ssr: false })(Page);
+export default withUrqlClient(nextUrqlClient)(Page);

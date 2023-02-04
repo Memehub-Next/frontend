@@ -1,7 +1,7 @@
 import { Skeleton, VStack } from "@chakra-ui/react";
 import { ResponsiveBar } from "@nivo/bar";
 import React from "react";
-import { RedditBetFragment } from "../../../graphql/urql-codegen";
+import { RedditBetFragment } from "../../graphql/urql-codegen";
 
 interface ProfitLossBarChartProps {
   redditBets?: RedditBetFragment[];

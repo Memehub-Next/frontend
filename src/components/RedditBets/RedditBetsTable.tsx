@@ -4,12 +4,12 @@ import Humanize from "humanize-plus";
 import React, { useState } from "react";
 import { AiOutlineCheck } from "react-icons/ai";
 import { MdOutlineClose } from "react-icons/md";
-import { EPositionSide, ERedditBetOrder, useUserRedditBetsPaginatedQuery } from "../../../graphql/urql-codegen";
+import { EPositionSide, ERedditBetOrder, useUserRedditBetsPaginatedQuery } from "../../graphql/urql-codegen";
 
 import { SkeletonText, Text, TextProps } from "@chakra-ui/react";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { useSkipPagination } from "../../../hooks/useSkipPagination";
+import { useSkipPagination } from "../../hooks/useSkipPagination";
 dayjs.extend(relativeTime);
 
 interface ExtendedTextProps extends TextProps {

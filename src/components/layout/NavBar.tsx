@@ -1,17 +1,17 @@
 import { HamburgerIcon } from "@chakra-ui/icons";
-import { Flex, HStack, Text } from "@chakra-ui/layout";
+import { Flex, HStack, Link, Text } from "@chakra-ui/layout";
 import { Avatar, Button, ButtonProps, IconButton, Image, Menu, MenuButton, MenuItem, MenuList, Tooltip } from "@chakra-ui/react";
+import { useRouter } from "next/router";
 import React from "react";
 import { AiOutlineStock } from "react-icons/ai";
 import { BsFillPersonFill } from "react-icons/bs";
 import { FaDiscord } from "react-icons/fa";
 import { RiLogoutBoxRLine } from "react-icons/ri";
 import { useGetCurrentSeasonIdQuery, useLogoutMutation, useMeQuery } from "../../graphql/urql-codegen";
-import { useRedirect } from "../../hooks/useRedirect";
 import { DEFAULT_AVATAR } from "../../utils/constants";
 
-export const MobileNavBar: React.FC = () => {
-  const redirect = useRedirect();
+export const NavBar: React.FC = () => {
+  const router = useRouter();
   const [{ data }] = useGetCurrentSeasonIdQuery();
   return (
     <Flex
@@ -38,7 +38,7 @@ export const MobileNavBar: React.FC = () => {
             variant="outline"
           />
           <MenuList>
-            <MenuItem onClick={redirect("/trading")} _focus={{ bg: "black", color: "white" }} color="white">
+            <MenuItem onClick={() => router.push("/trading")} _focus={{ bg: "black", color: "white" }} color="white">
               <AiOutlineStock />
               <Text>Stonks</Text>
             </MenuItem>
@@ -49,17 +49,17 @@ export const MobileNavBar: React.FC = () => {
           </MenuList>
         </Menu>
       </HStack>
-      <Image _hover={{ cursor: "pointer" }} src="/logos/main-logo.png" h="35px" onClick={redirect("/")} />
+      <Image _hover={{ cursor: "pointer" }} src="/logos/main-logo.png" h="35px" onClick={() => router.push("/")} />
       <HStack display={{ base: "none", sm: "none", md: "none", lg: "flex", xl: "flex" }} spacing={3}>
         <Tooltip shouldWrapChildren label={`Season ${data?.getCurrentSeasonId}`}>
-          <Button size="xs" onClick={redirect("/trading")}>
+          <Button size="xs" onClick={() => router.push("/trading")}>
             <HStack>
               <AiOutlineStock />
               <Text>Stonks</Text>
             </HStack>
           </Button>
         </Tooltip>
-        <Button size="xs">
+        <Button as={Link} href="https://discord.gg/QAcbE7Y" target="_blank" size="xs">
           <HStack>
             <FaDiscord />
             <Text>Discord</Text>
@@ -72,11 +72,11 @@ export const MobileNavBar: React.FC = () => {
 };
 
 const LoginButton: React.FC<ButtonProps> = () => {
-  const redirect = useRedirect();
+  const router = useRouter();
   const [{ data }] = useMeQuery();
   const [, logoutFN] = useLogoutMutation();
   return !data?.me ? (
-    <Button size="sm" onClick={redirect("/auth/login")}>
+    <Button size="sm" onClick={() => router.push("/auth/login")}>
       <BsFillPersonFill />
       <Text ml={3} noOfLines={1}>
         Login
@@ -87,7 +87,7 @@ const LoginButton: React.FC<ButtonProps> = () => {
       <Button size="xs" variant="icon" fontWeight="bold">
         {data?.me.gbp} GBP
       </Button>
-      <Button size="sm" onClick={redirect(`/profile/${data!.me!.username}`)}>
+      <Button size="sm" onClick={() => router.push(`/profile/${data!.me!.username}`)}>
         <HStack _hover={{ cursor: "pointer" }}>
           <Avatar size="xs" src={data?.me?.avatar || DEFAULT_AVATAR} />
           <Text noOfLines={1}>{data!.me!.username}</Text>

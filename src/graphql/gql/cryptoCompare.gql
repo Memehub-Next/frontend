@@ -1,0 +1,11 @@
+fragment pairPriceDTO on PairPriceDTO {
+  base
+  quote
+  price
+}
+
+query GetCryptoPrices($pairs: [PairArg!]!) {
+  getCryptoPrices(pairs: $pairs) {
+    ...pairPriceDTO
+  }
+}

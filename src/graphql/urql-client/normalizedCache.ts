@@ -42,9 +42,12 @@ export const normalizedCache = cacheExchange({
   keys: {
     RedditMemePDTO: () => v4().toString(),
     RedditBetPDTO: () => v4().toString(),
-    LeaderboardDTO: () => v4().toString(),
+    LeaderDTO: () => v4().toString(),
+    MyLeaderboardsDTO: () => v4().toString(),
+    AllLeaderboardsDTO: () => v4().toString(),
     LeaderboardPDTO: () => v4().toString(),
     SeasonSummaryDTO: () => v4().toString(),
+    PairPriceDTO: () => v4().toString(),
 
     UserEntity: (user) => user.username as string,
   },
@@ -66,6 +69,7 @@ export const normalizedCache = cacheExchange({
         await Router.push("/");
       },
       placeBet: (parent: PlaceBetMutation, _args: PlaceBetMutationVariables, cache: Cache, _info: ResolveInfo) => {
+        console.log("updating cache");
         cache.updateQuery<MeQuery>({ query: MeDocument }, (data) => {
           const user = data?.me;
           if (!user) return data;
@@ -79,7 +83,11 @@ export const normalizedCache = cacheExchange({
           id: parent.placeBet.redditMemeId,
           __typename: "RedditMemeEntity",
         });
-        if (!meme) throw new Error("where meme?");
+        if (!meme) {
+          console.log("where meme?");
+          throw new Error("where meme?");
+        }
+        console.log(`cache redditmemeId: ${parent.placeBet.redditMemeId}`);
         meme.redditBet = parent.placeBet;
         cache.writeFragment(RedditMemeFragmentDoc, meme);
       },
