@@ -1,8 +1,9 @@
-import { Button, Divider, HStack, Link, Text, VStack } from "@chakra-ui/react";
+import { Button, Divider, HStack, Link, Text, Tooltip, VStack } from "@chakra-ui/react";
 import { Form, Formik } from "formik";
 import { GetServerSideProps, NextPage } from "next";
 import { withUrqlClient } from "next-urql";
 import { getSelectorsByUserAgent } from "react-device-detect";
+import { HiRefresh } from "react-icons/hi";
 import * as yup from "yup";
 import InputField from "../../components/formik/InputField";
 import { ELayout, getServerSideLayoutProps } from "../../components/layout/getServerSideLayoutProps";
@@ -31,7 +32,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 };
 
 const Page: NextPage = () => {
-  const { isInstalled } = useHiveKeychain();
+  const { isInstalled, checkHiveKeychain } = useHiveKeychain();
   const [, loginFN] = useHiveLoginMutation();
   return (
     <SingleColLayout>
@@ -62,13 +63,19 @@ const Page: NextPage = () => {
           {({ isSubmitting }) => (
             <VStack as={Form} w={{ base: "90%", sm: "50%", md: "50%", lg: "20%", xl: "20%" }}>
               <InputField placeholder="Username" name="username" />
-              <Button w="100%" isDisabled={!isInstalled} isLoading={isSubmitting} type="submit">
-                Hive Keychain Login
-              </Button>
+              <HStack w="100%">
+                <Button w="100%" isDisabled={!isInstalled} isLoading={isSubmitting} type="submit">
+                  Hive Keychain Login
+                </Button>
+                <Tooltip shouldWrapChildren label="Recheck for Hive Keychain">
+                  <Button onClick={checkHiveKeychain}>
+                    <HiRefresh />
+                  </Button>
+                </Tooltip>
+              </HStack>
               <Text>If the Login button is not active then:</Text>
               <Text>- You dont have Hivechain installed</Text>
-              <Text>- Your browser is blocking Hive Keychain. (open it and refresh page)</Text>
-              <Text>- Memehub couldnt connect to Hive Keychain. (navigate to a different page and back)</Text>
+              <Text>- Your browser is blocking Hive Keychain. (open it and refresh)</Text>
             </VStack>
           )}
         </Formik>
