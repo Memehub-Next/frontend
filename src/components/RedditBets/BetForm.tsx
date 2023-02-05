@@ -65,6 +65,7 @@ export const BetForm: React.FC<BetFormProps> = ({ redditMeme }) => {
                     <Text>Yolo</Text>
                   </Checkbox>
                 </Tooltip>
+                {!isBuy && <Text noOfLines={1}>DANGEROUS</Text>}
                 <Switch
                   size="sm"
                   isChecked={isBuy}
@@ -76,10 +77,10 @@ export const BetForm: React.FC<BetFormProps> = ({ redditMeme }) => {
                   {isBuy ? "Long" : "Short"}
                 </Switch>
               </HStack>
-              <Text>Bet Size in GBP</Text>
+              <Text>Bet Size (GBP)</Text>
               <NumberInputField name="betSize" min={1} step={5} max={data?.me?.gbp ?? 100} />
-              <Text alignSelf="flex-start">Target Percentile</Text>
-              <NumberInputField name="target" isDisabled={!isBuy} min={50} max={99} step={1} />
+              <Text>Target Percentile</Text>
+              <NumberInputField name="target" isDisabled={!isBuy} min={50} max={99} step={1} />s
               <Table>
                 <Tbody>
                   <Tr>
@@ -97,9 +98,15 @@ export const BetForm: React.FC<BetFormProps> = ({ redditMeme }) => {
                 </Tbody>
               </Table>
               {data?.me ? (
-                <Button variant={isBuy ? "upvote" : "downvote"} isActive={true} isLoading={isSubmitting} w="100%" type="submit">
-                  {isYolo ? "YOLO!" : isBuy ? "Buy" : "Sell"}
-                </Button>
+                isBuy ? (
+                  <Button variant="upvote" isActive={true} isLoading={isSubmitting} w="100%" type="submit">
+                    {isYolo ? "YOLO!" : "Buy"}
+                  </Button>
+                ) : (
+                  <Button variant="downvote" isActive={true} isLoading={isSubmitting} w="100%" type="submit">
+                    {isYolo ? "YOLO!" : "Sell"}
+                  </Button>
+                )
               ) : (
                 <>
                   <Button variant="icon" w="100%" onClick={() => router.push("/auth/login")}>
