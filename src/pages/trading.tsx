@@ -25,23 +25,18 @@ function between(min: number, max: number) {
 }
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  try {
-    const userAgent = ctx.req.headers["user-agent"] as string;
-    const { isMobile } = getSelectorsByUserAgent(userAgent);
-    if (isMobile) return { redirect: { permanent: false, destination: "/about/mobile" } };
-    const { ssrCache, client } = await getServerSideLayoutProps(ctx, ELayout.DoubleColumn);
-    const { data } = await client.query<RedditMemeCountQuery, RedditMemeCountQueryVariables>(RedditMemeCountDocument, {}).toPromise();
-    if (!data?.redditMemeCount) throw new Error("back reddit meme count");
-    const maxSkip = data?.redditMemeCount - 10;
-    const initialSkip = between(0, maxSkip);
-    await client
-      .query<RandomRedditMemesQuery, RandomRedditMemesQueryVariables>(RandomRedditMemesDocument, { take: 10, skip: initialSkip })
-      .toPromise();
-    return { props: { initialSkip, maxSkip, urqlState: ssrCache.extractData() } };
-  } catch (error) {
-    console.error(error);
-    return { redirect: { permanent: false, destination: "/auth/login" } };
-  }
+  const userAgent = ctx.req.headers["user-agent"] as string;
+  const { isMobile } = getSelectorsByUserAgent(userAgent);
+  if (isMobile) return { redirect: { permanent: false, destination: "/about/mobile" } };
+  const { ssrCache, client } = await getServerSideLayoutProps(ctx, ELayout.DoubleColumn);
+  const { data } = await client.query<RedditMemeCountQuery, RedditMemeCountQueryVariables>(RedditMemeCountDocument, {}).toPromise();
+  if (!data?.redditMemeCount) throw new Error("back reddit meme count");
+  const maxSkip = data?.redditMemeCount - 10;
+  const initialSkip = between(0, maxSkip);
+  await client
+    .query<RandomRedditMemesQuery, RandomRedditMemesQueryVariables>(RandomRedditMemesDocument, { take: 10, skip: initialSkip })
+    .toPromise();
+  return { props: { initialSkip, maxSkip, urqlState: ssrCache.extractData() } };
 };
 
 interface PageProps {

@@ -19,16 +19,11 @@ const validationSchema = yup.object({
 const initialValues: yup.InferType<typeof validationSchema> = { username: "" };
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  try {
-    const userAgent = ctx.req.headers["user-agent"] as string;
-    const { isMobile } = getSelectorsByUserAgent(userAgent);
-    if (isMobile) return { redirect: { permanent: false, destination: "/about/mobile" } };
-    const { ssrCache } = await getServerSideLayoutProps(ctx, ELayout.DoubleColumn);
-    return { props: { urqlState: ssrCache.extractData() } };
-  } catch (error) {
-    console.error(error);
-    return { redirect: { permanent: false, destination: "/auth/login" } };
-  }
+  const userAgent = ctx.req.headers["user-agent"] as string;
+  const { isMobile } = getSelectorsByUserAgent(userAgent);
+  if (isMobile) return { redirect: { permanent: false, destination: "/about/mobile" } };
+  const { ssrCache } = await getServerSideLayoutProps(ctx, ELayout.DoubleColumn);
+  return { props: { urqlState: ssrCache.extractData() } };
 };
 
 const Page: NextPage = () => {

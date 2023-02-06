@@ -48,36 +48,29 @@ const queryParamSchema = yup.object({
 interface PageProps extends yup.InferType<typeof queryParamSchema> {}
 
 export const getServerSideProps: GetServerSideProps<InferType<typeof queryParamSchema>> = async (ctx) => {
-  try {
-    const { username } = await queryParamSchema.validate(ctx.query, { strict: true });
-    const userAgent = ctx.req.headers["user-agent"] as string;
-    const { isMobile } = getSelectorsByUserAgent(userAgent);
-    if (isMobile) return { redirect: { permanent: false, destination: "/about/mobile" } };
-    const { ssrCache, client, seasonId } = await getServerSideLayoutProps(ctx, ELayout.DoubleColumn);
-    await client.query<SeasonSummaryQuery, SeasonSummaryQueryVariables>(SeasonSummaryDocument, { username, seasonId }).toPromise();
-    await client
-      .query<GbpBySeasonQuery, GbpBySeasonQueryVariables>(GbpBySeasonDocument, { username, seasonId: seasonId ?? -1 })
-      .toPromise();
-    await client.query<UserQuery, UserQueryVariables>(UserDocument, { username }).toPromise();
-    await client.query<TotalGbpQuery, TotalGbpQueryVariables>(TotalGbpDocument, { username }).toPromise();
-    await client
-      .query<UserRedditBetsQuery, UserRedditBetsQueryVariables>(UserRedditBetsDocument, { take: 30, username, seasonId })
-      .toPromise();
-    await client
-      .query<UserRedditBetsPaginatedQuery, UserRedditBetsPaginatedQueryVariables>(UserRedditBetsPaginatedDocument, {
-        take: 30,
-        username,
-        eRedditBetOrder: ERedditBetOrder.CreatedAt,
-        isASC: false,
-        skip: 0,
-        seasonId,
-      })
-      .toPromise();
-    return { props: { username, urqlState: ssrCache.extractData() } };
-  } catch (error) {
-    console.error(error);
-    return { redirect: { permanent: false, destination: "/auth/login" } };
-  }
+  const { username } = await queryParamSchema.validate(ctx.query, { strict: true });
+  const userAgent = ctx.req.headers["user-agent"] as string;
+  const { isMobile } = getSelectorsByUserAgent(userAgent);
+  if (isMobile) return { redirect: { permanent: false, destination: "/about/mobile" } };
+  const { ssrCache, client, seasonId } = await getServerSideLayoutProps(ctx, ELayout.DoubleColumn);
+  await client.query<SeasonSummaryQuery, SeasonSummaryQueryVariables>(SeasonSummaryDocument, { username, seasonId }).toPromise();
+  await client.query<GbpBySeasonQuery, GbpBySeasonQueryVariables>(GbpBySeasonDocument, { username, seasonId: seasonId ?? -1 }).toPromise();
+  await client.query<UserQuery, UserQueryVariables>(UserDocument, { username }).toPromise();
+  await client.query<TotalGbpQuery, TotalGbpQueryVariables>(TotalGbpDocument, { username }).toPromise();
+  await client
+    .query<UserRedditBetsQuery, UserRedditBetsQueryVariables>(UserRedditBetsDocument, { take: 30, username, seasonId })
+    .toPromise();
+  await client
+    .query<UserRedditBetsPaginatedQuery, UserRedditBetsPaginatedQueryVariables>(UserRedditBetsPaginatedDocument, {
+      take: 30,
+      username,
+      eRedditBetOrder: ERedditBetOrder.CreatedAt,
+      isASC: false,
+      skip: 0,
+      seasonId,
+    })
+    .toPromise();
+  return { props: { username, urqlState: ssrCache.extractData() } };
 };
 
 const Page: NextPage<PageProps> = ({ username }) => {
