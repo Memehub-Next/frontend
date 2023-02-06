@@ -31,7 +31,7 @@ export const BetForm: React.FC<BetFormProps> = ({ redditMeme }) => {
       .number()
       .integer()
       .min(1)
-      .max(data?.me?.gbp ?? 100)
+      .max(data?.me?.gbp ?? 1000)
       .required(),
     target: yup.number().integer().min(50).max(99).required(),
   });
@@ -78,7 +78,7 @@ export const BetForm: React.FC<BetFormProps> = ({ redditMeme }) => {
                 </Switch>
               </HStack>
               <Text>Bet Size (GBP)</Text>
-              <NumberInputField name="betSize" min={1} step={5} max={data?.me?.gbp ?? 100} />
+              <NumberInputField name="betSize" min={1} step={5} max={data?.me?.gbp ?? 0} />
               <Text>Target Percentile</Text>
               <NumberInputField name="target" isDisabled={!isBuy} min={50} max={99} step={1} />s
               <Table>
