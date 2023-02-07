@@ -28,7 +28,7 @@ export const LeaderboardWidget: React.FC<LeaderboardWidgetProps> = React.memo(({
   const [userCalled, { off, on }] = useBoolean(false);
   useEffect(() => {
     if (userCalled) return off();
-    const id = setTimeout(() => setIndex((index) => (index + 1) % leaderboards.length), 1000 * 60);
+    const id = setTimeout(() => setIndex((index) => (index + 1) % leaderboards.length), 1000 * 10);
     return () => clearTimeout(id);
   }, [index]);
   const eLeaderboard = leaderboards[index];

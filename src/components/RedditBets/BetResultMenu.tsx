@@ -24,7 +24,7 @@ export const BetResultMenu: React.FC<BetResultMenuProps> = ({ redditBet }) => (
           </Tr>
         )}
         <Tr>
-          <Td>Meme's Percentile</Td>
+          <Td>Percentile</Td>
           <Td isNumeric>{redditBet.percentile.toString()}</Td>
         </Tr>
         <Tr>
