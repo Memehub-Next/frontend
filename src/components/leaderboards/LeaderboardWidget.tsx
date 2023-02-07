@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { BiBookBookmark } from "react-icons/bi";
 import { AllLeaderboardsDtoFragment, ELeaderboard, MyLeaderboardsDtoFragment } from "../../graphql/urql-codegen";
+import { between } from "../../utils/between";
 import { Leader } from "./Leader";
 
 const leaderboards = Object.values(ELeaderboard);
@@ -24,7 +25,7 @@ interface LeaderboardWidgetProps extends StackProps {
 
 export const LeaderboardWidget: React.FC<LeaderboardWidgetProps> = React.memo(({ myLeaderboards, allLeaderboards, ...stackProps }) => {
   const router = useRouter();
-  const [index, setIndex] = useState(0);
+  const [index, setIndex] = useState(between(0, leaderboards.length - 1));
   const [userCalled, { off, on }] = useBoolean(false);
   useEffect(() => {
     if (userCalled) return off();

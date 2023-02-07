@@ -20,12 +20,9 @@ import {
   RedditMemeCountDocument,
   RedditMemeCountQuery,
   RedditMemeCountQueryVariables,
-  useRandomRedditMemesQuery,
+  useRandomRedditMemesQuery
 } from "../graphql/urql-codegen";
-
-function between(min: number, max: number) {
-  return Math.floor(Math.random() * (max - min) + min);
-}
+import { between } from "../utils/between";
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const userAgent = ctx.req.headers["user-agent"] as string;
