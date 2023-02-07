@@ -45,9 +45,10 @@ export const BetForm: React.FC<BetFormProps> = ({ redditMeme }) => {
       <Formik
         initialValues={{ betSize: 5, target: 50 }}
         validationSchema={validationSchema}
-        onSubmit={({ betSize, target }) =>
-          placeBetFN({ betSize, redditMemeId: redditMeme?.id!, target, ePositionSide: isBuy ? EPositionSide.Buy : EPositionSide.Sell })
-        }
+        onSubmit={({ betSize, target }) => {
+          if (redditMeme?.id)
+            placeBetFN({ betSize, redditMemeId: redditMeme.id, target, ePositionSide: isBuy ? EPositionSide.Buy : EPositionSide.Sell });
+        }}
       >
         {({ isSubmitting, values: { betSize, target }, setFieldValue }) => {
           const isYolo = betSize === (data?.me?.gbp ?? 100);

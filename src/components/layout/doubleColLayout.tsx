@@ -1,5 +1,5 @@
 import { Divider, Grid, GridItem, HStack, Link, Text, VStack } from "@chakra-ui/react";
-import { PropsWithChildren } from "react";
+import { PropsWithChildren, useEffect } from "react";
 import { useAllLeaderboardsQuery, useGetCryptoPricesQuery, useMyLeaderboardsQuery } from "../../graphql/urql-codegen";
 import { LeaderboardWidget } from "../leaderboards/LeaderboardWidget";
 import { ImageModal } from "../misc/ImageModal";
@@ -10,9 +10,9 @@ import { PageContainer } from "./PageContainer";
 interface DoubleColLayoutProps {}
 
 export const DoubleColLayout: React.FC<PropsWithChildren<DoubleColLayoutProps>> = ({ children }) => {
-  const [allLeaderboardsResp] = useAllLeaderboardsQuery({ variables: { take: 3 } });
-  const [myLeaderboardsResp] = useMyLeaderboardsQuery();
-  const [getCryptoPricesResp] = useGetCryptoPricesQuery({
+  const [allLeaderboardsResp, allLeaderboardsRefetch] = useAllLeaderboardsQuery({ variables: { take: 3 } });
+  const [myLeaderboardsResp, myLeaderboardsRefetch] = useMyLeaderboardsQuery();
+  const [getCryptoPricesResp, getCryptoPricesRefetch] = useGetCryptoPricesQuery({
     variables: {
       pairs: [
         { base: "HIVE", quote: "USD" },
@@ -21,6 +21,25 @@ export const DoubleColLayout: React.FC<PropsWithChildren<DoubleColLayoutProps>> 
       ],
     },
   });
+
+  useEffect(() => {
+    if (allLeaderboardsResp.fetching) return;
+    const timerId = setTimeout(() => allLeaderboardsRefetch({ requestPolicy: "network-only" }), 60 * 1000);
+    return () => clearTimeout(timerId);
+  }, [allLeaderboardsResp.fetching]);
+
+  useEffect(() => {
+    if (myLeaderboardsResp.fetching) return;
+    const timerId = setTimeout(() => myLeaderboardsRefetch({ requestPolicy: "network-only" }), 60 * 1000);
+    return () => clearTimeout(timerId);
+  }, [myLeaderboardsResp.fetching]);
+
+  useEffect(() => {
+    if (getCryptoPricesResp.fetching) return;
+    const timerId = setTimeout(() => getCryptoPricesRefetch({ requestPolicy: "network-only" }), 60 * 1000);
+    return () => clearTimeout(timerId);
+  }, [getCryptoPricesResp.fetching]);
+
   return (
     <PageContainer minHeight="100vh" overflow="auto">
       <NavBar />
