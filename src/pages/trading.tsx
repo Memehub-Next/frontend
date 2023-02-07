@@ -14,6 +14,9 @@ import {
   RandomRedditMemesDocument,
   RandomRedditMemesQuery,
   RandomRedditMemesQueryVariables,
+  RedditBetCountDocument,
+  RedditBetCountQuery,
+  RedditBetCountQueryVariables,
   RedditMemeCountDocument,
   RedditMemeCountQuery,
   RedditMemeCountQueryVariables,
@@ -29,9 +32,12 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { isMobile } = getSelectorsByUserAgent(userAgent);
   if (isMobile) return { redirect: { permanent: false, destination: "/about/mobile" } };
   const { ssrCache, client } = await getServerSideLayoutProps(ctx, ELayout.DoubleColumn);
-  const { data } = await client.query<RedditMemeCountQuery, RedditMemeCountQueryVariables>(RedditMemeCountDocument, {}).toPromise();
-  if (!data?.redditMemeCount) throw new Error("back reddit meme count");
-  const maxSkip = data?.redditMemeCount - 10;
+  const redditMemeCountResp = await client
+    .query<RedditMemeCountQuery, RedditMemeCountQueryVariables>(RedditMemeCountDocument, {})
+    .toPromise();
+  if (!redditMemeCountResp.data?.redditMemeCount) throw new Error("back reddit meme count");
+  const redditBetCountResp = await client.query<RedditBetCountQuery, RedditBetCountQueryVariables>(RedditBetCountDocument, {}).toPromise();
+  const maxSkip = redditMemeCountResp.data?.redditMemeCount - (redditBetCountResp.data?.redditBetCount ?? 0) - 10;
   const initialSkip = between(0, maxSkip);
   await client
     .query<RandomRedditMemesQuery, RandomRedditMemesQueryVariables>(RandomRedditMemesDocument, { take: 10, skip: initialSkip })

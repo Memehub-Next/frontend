@@ -27,6 +27,10 @@ fragment paginatedRedditBets on RedditBetPDTO {
   hasMore
 }
 
+query RedditBetCount {
+  redditBetCount
+}
+
 query UserRedditBetsPaginated(
   $take: Int!
   $skip: Int!

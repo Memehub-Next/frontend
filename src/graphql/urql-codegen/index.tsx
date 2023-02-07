@@ -144,6 +144,7 @@ export type Query = {
   myLeaderboards?: Maybe<MyLeaderboardsDto>;
   myRedditBet?: Maybe<RedditBetEntity>;
   randomRedditMemes: Array<RedditMemeEntity>;
+  redditBetCount: Scalars['Int'];
   redditMemeCount: Scalars['Int'];
   seasonSummary?: Maybe<SeasonSummaryDto>;
   totalGbp: Scalars['Int'];
@@ -387,6 +388,11 @@ export type RedditBetFragment = { __typename?: 'RedditBetEntity', id: string, re
 export type RedditBetMemeFragment = { __typename?: 'RedditBetEntity', id: string, redditMemeId: string, betSize: number, target?: number | null, percentile: number, username: string, createdAt: any, profitLoss: number, isYolo: boolean, side: EPositionSide, meme: { __typename?: 'RedditMemeEntity', id: string, url: string } };
 
 export type PaginatedRedditBetsFragment = { __typename?: 'RedditBetPDTO', hasMore: boolean, items: Array<{ __typename?: 'RedditBetEntity', id: string, redditMemeId: string, betSize: number, target?: number | null, percentile: number, username: string, createdAt: any, profitLoss: number, isYolo: boolean, side: EPositionSide, meme: { __typename?: 'RedditMemeEntity', id: string, url: string } }> };
+
+export type RedditBetCountQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type RedditBetCountQuery = { __typename?: 'Query', redditBetCount: number };
 
 export type UserRedditBetsPaginatedQueryVariables = Exact<{
   take: Scalars['Int'];
@@ -726,6 +732,15 @@ export const MyLeaderboardsDocument = gql`
 
 export function useMyLeaderboardsQuery(options?: Omit<Urql.UseQueryArgs<MyLeaderboardsQueryVariables>, 'query'>) {
   return Urql.useQuery<MyLeaderboardsQuery, MyLeaderboardsQueryVariables>({ query: MyLeaderboardsDocument, ...options });
+};
+export const RedditBetCountDocument = gql`
+    query RedditBetCount {
+  redditBetCount
+}
+    `;
+
+export function useRedditBetCountQuery(options?: Omit<Urql.UseQueryArgs<RedditBetCountQueryVariables>, 'query'>) {
+  return Urql.useQuery<RedditBetCountQuery, RedditBetCountQueryVariables>({ query: RedditBetCountDocument, ...options });
 };
 export const UserRedditBetsPaginatedDocument = gql`
     query UserRedditBetsPaginated($take: Int!, $skip: Int!, $eRedditBetOrder: ERedditBetOrder!, $username: String!, $isASC: Boolean!, $isYolo: Boolean, $seasonId: Int, $ePositionSide: EPositionSide) {
